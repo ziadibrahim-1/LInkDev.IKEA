@@ -1,4 +1,6 @@
 using LinkDev.IKEA.DAL;
+using LinkDev.IKEA.DAL.Contracts;
+using LinkDev.IKEA.PL.Extentions;
 
 namespace LinkDev.IKEA.PL
 {
@@ -19,6 +21,10 @@ namespace LinkDev.IKEA.PL
             #endregion
 
             var app = builder.Build();
+
+            #region Database Initializer
+            app.InitializeDatabase(); 
+            #endregion
 
             #region Http Requsts Pipelines
             // Configure the HTTP request pipeline.
