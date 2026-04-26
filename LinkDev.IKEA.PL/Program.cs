@@ -1,3 +1,5 @@
+using LinkDev.IKEA.DAL;
+
 namespace LinkDev.IKEA.PL
 {
     public class Program
@@ -6,11 +8,19 @@ namespace LinkDev.IKEA.PL
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            #region Services
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            //builder.Services.AddPersistenceServices(builder.Configuration);
+            //builder.Services.AddPersistenceServices(builder.Configuration);
+            builder.Services.AddPersistenceServices(builder.Configuration);
+
+            #endregion
+
             var app = builder.Build();
 
+            #region Http Requsts Pipelines
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -28,7 +38,8 @@ namespace LinkDev.IKEA.PL
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
-                .WithStaticAssets();
+                .WithStaticAssets(); 
+            #endregion
 
             app.Run();
         }
