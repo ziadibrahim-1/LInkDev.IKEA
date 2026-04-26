@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LinkDev.IKEA.DAL.Common.Entites
 {
-    internal class BaseAuditableEntity<Tkey> : BaseEntity<Tkey>
+    public class BaseAuditableEntity<Tkey> : BaseEntity<Tkey>
         where Tkey : IEquatable <Tkey>
     {
         public required string CreatedBy { get; set; }
