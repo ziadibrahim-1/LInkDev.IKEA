@@ -16,10 +16,10 @@ namespace LinkDev.IKEA.DAL.Persistence.UnitOfWork
 
         public UnitOfWork(ApplicationDbContext dbContext) // Ask RunTime to create an instance of ApplicationDbContext and pass it to this constructor Implecitly
         {
-            DepartmentRepository = new DepartmentRepository(dbContext);
             _dbContext = dbContext;
+            DepartmentRepository = new DepartmentRepository(dbContext);
         }
-        public IDepartmentRepository? DepartmentRepository { get; set; }
+        public IDepartmentRepository DepartmentRepository { get; set; }
 
         public int Complete()
         {
