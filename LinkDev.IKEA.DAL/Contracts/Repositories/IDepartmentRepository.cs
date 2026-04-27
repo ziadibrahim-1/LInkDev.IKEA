@@ -11,8 +11,8 @@ namespace LinkDev.IKEA.DAL.Contracts.Repositories
     {
         IEnumerable<Department> GetAll(bool WithTracking = false);
         Department? Get(int id);
-        int Add(Department department);
-        int Update(Department department);
-        int Delete(int id);
+        void Add(Department department);
+        void Update(Department department);
+        void Delete(int id);
     }
 }
