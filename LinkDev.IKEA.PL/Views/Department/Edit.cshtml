@@ -1,0 +1,82 @@
+﻿@model UpdateDepartmentViewModel
+@{
+    ViewData["Title"] = "Update Department";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header text-dark py-4" style="background: linear-gradient(135deg, #ffd54f 0%, #ffca28 45%, #f9a825 100%);">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div>
+                            <div class="badge bg-dark text-warning px-3 py-2 mb-2">Department</div>
+                            <h1 class="h3 fw-bold mb-1">Update Department</h1>
+                            <p class="mb-0 text-dark-50">Edit the department information and keep the record up to date.</p>
+                        </div>
+                        <div class="rounded-circle bg-dark bg-opacity-10 d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 72px; height: 72px;">
+                            <i class="fas fa-pen-to-square fa-2x text-dark"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5 bg-light">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 shadow-sm mb-4"></div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label asp-for="Code" class="form-label fw-semibold text-warning-emphasis"></label>
+                                <div class="input-group input-group-lg shadow-sm">
+                                    <span class="input-group-text bg-warning-subtle border-warning-subtle border-end-0">
+                                        <i class="fas fa-barcode text-warning"></i>
+                                    </span>
+                                    <input asp-for="Code" class="form-control border-start-0" placeholder="Department code" />
+                                </div>
+                                <span asp-validation-for="Code" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Name" class="form-label fw-semibold text-warning-emphasis"></label>
+                                <div class="input-group input-group-lg shadow-sm">
+                                    <span class="input-group-text bg-warning-subtle border-warning-subtle border-end-0">
+                                        <i class="fas fa-building text-warning"></i>
+                                    </span>
+                                    <input asp-for="Name" class="form-control border-start-0" placeholder="Department name" />
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Description" class="form-label fw-semibold text-warning-emphasis"></label>
+                                <textarea asp-for="Description" class="form-control shadow-sm" rows="5" placeholder="Describe this department"></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label asp-for="CreationDate" class="form-label fw-semibold text-warning-emphasis"></label>
+                                <div class="input-group input-group-lg shadow-sm">
+                                    <span class="input-group-text bg-warning-subtle border-warning-subtle border-end-0">
+                                        <i class="fas fa-calendar-day text-warning"></i>
+                                    </span>
+                                    <input asp-for="CreationDate" class="form-control border-start-0" type="date" />
+                                </div>
+                                <span asp-validation-for="CreationDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-5 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-arrow-left me-1"></i> Back to List
+                            </a>
+
+                            <button type="submit" class="btn btn-warning btn-lg px-4 shadow-sm fw-semibold">
+                                <i class="fas fa-floppy-disk me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

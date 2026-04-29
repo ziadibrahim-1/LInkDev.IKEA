@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LinkDev.IKEA.BLL.Services.Departments
 {
-    internal interface IDepartmentService
+    public interface IDepartmentService
     {
         IEnumerable<DepartmentDto> GetDepartments();
 

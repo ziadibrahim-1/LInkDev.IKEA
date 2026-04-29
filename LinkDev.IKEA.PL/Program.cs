@@ -1,3 +1,4 @@
+using LinkDev.IKEA.BLL;
 using LinkDev.IKEA.DAL;
 using LinkDev.IKEA.DAL.Contracts;
 using LinkDev.IKEA.PL.Extentions;
@@ -17,6 +18,7 @@ namespace LinkDev.IKEA.PL
             //builder.Services.AddPersistenceServices(builder.Configuration);
             //builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddPersistenceServices(builder.Configuration);
+            builder.Services.AddApplicationServices();
 
             #endregion
 
