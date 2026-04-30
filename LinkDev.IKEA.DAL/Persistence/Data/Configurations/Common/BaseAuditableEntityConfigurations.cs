@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LinkDev.IKEA.DAL.Persistence.Data.Configurations.Common
 {
-    internal class BaseAuditableEntityConfigurations<Tkey, TEntity> : BaseEntityConfigurations<Tkey, TEntity>
+    public class BaseAuditableEntityConfigurations<Tkey, TEntity> : BaseEntityConfigurations<Tkey, TEntity>
         where Tkey : IEquatable<Tkey>
         where TEntity : BaseAuditableEntity<Tkey>
     {

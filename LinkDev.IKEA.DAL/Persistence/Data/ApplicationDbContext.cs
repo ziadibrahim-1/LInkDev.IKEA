@@ -1,4 +1,6 @@
-﻿using LinkDev.IKEA.DAL.Entities.Department;
+﻿
+using LinkDev.IKEA.DAL.Entities.Departments;
+using LinkDev.IKEA.DAL.Entities.Employees;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -19,5 +21,6 @@ namespace LinkDev.IKEA.DAL.Persistence.Data
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
         public DbSet<Department> Departments { get; set; }
-    }
+        public DbSet<Employee> Employees { get; set; }
+        }
 }

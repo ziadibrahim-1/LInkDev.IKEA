@@ -1,9 +1,4 @@
-﻿using LinkDev.IKEA.DAL.Entities.Department;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using LinkDev.IKEA.DAL.Entities.Departments;
 
 namespace LinkDev.IKEA.DAL.Contracts.Repositories
 {

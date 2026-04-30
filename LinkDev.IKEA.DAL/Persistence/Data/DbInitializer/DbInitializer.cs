@@ -1,5 +1,6 @@
-﻿using LinkDev.IKEA.DAL.Contracts;
-using LinkDev.IKEA.DAL.Entities.Department;
+﻿using LinkDev.IKEA.DAL.Common.JsonConvertors;
+using LinkDev.IKEA.DAL.Contracts;
+using LinkDev.IKEA.DAL.Entities.Departments;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
@@ -22,6 +23,16 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.DbInitializer
 
         public void Seed()
         {
+            var serializeOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = false,
+                Converters =
+                {
+                    new DateOnlyJsonConvertor(),
+                    new GenderJsonConvertor(),
+                    new EmployeeTypeJsonConvertor()
+                }
+            };
             if (!_dbContext.Departments.Any())
             {
                 
@@ -30,6 +41,18 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.DbInitializer
                 if (Departments != null && Departments.Count > 0)
                 {
                     _dbContext.Departments.AddRange(Departments);
+                    _dbContext.SaveChanges();
+                }
+            }
+
+            if (!_dbContext.Employees.Any())
+            {
+
+                var EmployeeOptions = File.ReadAllText("../LinkDev.IKEA.DAL/Persistence/Data/Seeds/employees.json");
+                var Employees = JsonSerializer.Deserialize<List<Department>>(EmployeeOptions, serializeOptions);
+                if (Employees != null && Employees.Count > 0)
+                {
+                    _dbContext.Departments.AddRange(Employees);
                     _dbContext.SaveChanges();
                 }
             }

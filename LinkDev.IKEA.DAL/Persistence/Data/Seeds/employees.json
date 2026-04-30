@@ -1,0 +1,49 @@
+[
+  {
+    "Name": "Ahmed",
+    "Age": 29,
+    "Email": "ahmed.nasr@linkdev.com",
+    "Salary": 8000,
+    "Address": "Alex",
+    "DepartmentId": 10
+  },
+  {
+    "Name": "Nadia",
+    "Age": 27,
+    "Email": "nadia.ali@gmail.com",
+    "Salary": 5000,
+    "Address": "Cairo",
+    "DepartmentId": 20
+  },
+  {
+    "Name": "Soha",
+    "Age": 20,
+    "Email": "soha.mohamed@gmail.com",
+    "Salary": 3000,
+    "Address": "Cairo",
+    "DepartmentId": 10
+  },
+  {
+    "Name": "Mazen",
+    "Age": 25,
+    "Email": "mazen@gmail.com",
+    "Salary": 8000,
+    "Address": "Cairo",
+    "DepartmentId": 20
+  },
+  {
+    "Name": "Sameh",
+    "Age": 30,
+    "Email": "sameh@gmail.com",
+    "Salary": 9000,
+    "Address": "Alex",
+    "DepartmentId": 10
+  },
+  {
+    "Name": "Pola",
+    "Age": 30,
+    "Email": "pola@gmail.com",
+    "Salary": 5000,
+    "Address": "Cairo"
+  }
+]
