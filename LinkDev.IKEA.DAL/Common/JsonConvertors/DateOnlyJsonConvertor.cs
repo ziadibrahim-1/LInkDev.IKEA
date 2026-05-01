@@ -12,7 +12,12 @@ namespace LinkDev.IKEA.DAL.Common.JsonConvertors
 {
     public class DateOnlyJsonConvertor : JsonConverter<DateOnly>
     {
-        private const string Format = "dd/MM/yyyy";
+        private static readonly string[] Formats =
+        {
+            "dd/MM/yy",
+            "dd/MM/yyyy",
+            "yyyy-MM-dd",
+        };
 
         public override DateOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
@@ -21,17 +26,23 @@ namespace LinkDev.IKEA.DAL.Common.JsonConvertors
             if (string.IsNullOrWhiteSpace(value))
                 throw new JsonException("Date value is null or empty.");
 
-            if (DateOnly.TryParseExact(value, Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+            if (DateOnly.TryParseExact(
+                    value,
+                    Formats,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var date))
             {
                 return date;
             }
 
-            throw new JsonException($"Invalid date format. Expected format: {Format}");
+            throw new JsonException($"Invalid date format. Supported formats: {string.Join(", ", Formats)}");
         }
 
         public override void Write(Utf8JsonWriter writer, DateOnly value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(value.ToString(Format, CultureInfo.InvariantCulture));
+            
+            writer.WriteStringValue(value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture));
         }
     }
 }
