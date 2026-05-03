@@ -13,13 +13,19 @@ namespace LinkDev.IKEA.DAL.Persistence.UnitOfWork
     internal class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly Lazy<IDepartmentRepository> _departmentRepository;
+        private readonly Lazy<IEmployeeRepository> _employeeRepository;
+
 
         public UnitOfWork(ApplicationDbContext dbContext) // Ask RunTime to create an instance of ApplicationDbContext and pass it to this constructor Implecitly
         {
             _dbContext = dbContext;
-            DepartmentRepository = new DepartmentRepository(dbContext);
+            _departmentRepository = new Lazy<IDepartmentRepository>(() => new DepartmentRepository(_dbContext));
+            _employeeRepository = new Lazy<IEmployeeRepository>(() => new EmployeeRepository(_dbContext));
+
         }
-        public IDepartmentRepository DepartmentRepository { get; set; }
+        public IDepartmentRepository Departments => _departmentRepository.Value;
+        public IEmployeeRepository Employees => _employeeRepository.Value;
 
         public int Complete()
         {

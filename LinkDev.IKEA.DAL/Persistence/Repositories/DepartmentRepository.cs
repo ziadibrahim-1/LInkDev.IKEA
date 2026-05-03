@@ -5,53 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LinkDev.IKEA.DAL.Persistence.Repositories
 {
-    internal class DepartmentRepository : IDepartmentRepository
+    internal class DepartmentRepository : BaseRepository<Department, int>, IDepartmentRepository
     {
-        private readonly ApplicationDbContext _dbContext;
-
-        public DepartmentRepository(ApplicationDbContext dbContext)
+        public DepartmentRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
-            _dbContext = dbContext;
-        }
-        public Department? Get(int id)
-        {
-            var department = _dbContext.Departments.Find(id);
-            //// var department = _dbContext.Departments.Local.FirstOrDefault(d => d.Id == id);
-            //// 
-            //// if (department == null)
-            ////     return _dbContext.Departments.FirstOrDefault(d => d.Id == id);
-
-            return department;
-
-        }
-
-        public IEnumerable<Department> GetAll(bool WithTracking = false)
-        {
-            if (!WithTracking)
-                return _dbContext.Departments.AsNoTracking();
-
-            return _dbContext.Departments;
-
-        }
-        public void Add(Department department)
-            => _dbContext.Departments.Add(department);
-          
-        
-
-        public void Update(Department department)
-            =>  _dbContext.Departments.Update(department);
-          
-        
-        public void Delete(int id)
-        {
-            var department = _dbContext.Departments.Find(id);
-            if (department is { })
-                 _dbContext.Departments.Remove(department);
-                
             
-
         }
-
-
     }
 }

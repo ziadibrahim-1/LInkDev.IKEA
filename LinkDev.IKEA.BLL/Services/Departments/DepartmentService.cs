@@ -15,7 +15,7 @@ namespace LinkDev.IKEA.BLL.Services.Departments
 
         public DepartmentDetailsDto? GetDepartmentById(int id)
         {
-            var department = _unitOfWork.DepartmentRepository.Get(id);
+            var department = _unitOfWork.Departments.Get(id);
             if (department == null)
                 return null;
             return new DepartmentDetailsDto(department.Id, department.Name, department.Description,
@@ -26,7 +26,7 @@ namespace LinkDev.IKEA.BLL.Services.Departments
 
         public IEnumerable<DepartmentDto> GetDepartments()
         {
-            var departments = _unitOfWork.DepartmentRepository.GetAll();
+            var departments = _unitOfWork.Departments.GetAll();
 
             foreach (var department in departments)
             {
@@ -47,7 +47,7 @@ namespace LinkDev.IKEA.BLL.Services.Departments
                 LastModifiedBy = ""
             };
 
-            _unitOfWork.DepartmentRepository.Add(DepartmentToCreate);   
+            _unitOfWork.Departments.Add(DepartmentToCreate);   
             return _unitOfWork.Complete();
         }
 
@@ -63,12 +63,12 @@ namespace LinkDev.IKEA.BLL.Services.Departments
                 CreatedBy = "",
                 LastModifiedBy = ""
             };
-            _unitOfWork.DepartmentRepository.Update(departmentToCreate);
+            _unitOfWork.Departments.Update(departmentToCreate);
             return _unitOfWork.Complete();
         }
         public bool DeleteDepartment(int id)
         {
-            _unitOfWork.DepartmentRepository.Delete(id);
+            _unitOfWork.Departments.Delete(id);
             var deleted = _unitOfWork.Complete() > 0;
             return deleted;
 

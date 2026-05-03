@@ -2,12 +2,8 @@
 
 namespace LinkDev.IKEA.DAL.Contracts.Repositories
 {
-    public interface IDepartmentRepository
+    public interface IDepartmentRepository : IBaseRepository<Department, int>
     {
-        IEnumerable<Department> GetAll(bool WithTracking = false);
-        Department? Get(int id);
-        void Add(Department department);
-        void Update(Department department);
-        void Delete(int id);
+        
     }
 }
