@@ -25,7 +25,7 @@ namespace LinkDev.IKEA.DAL.Contracts.Repositories
         /// <returns>A collection of entities that satisfy the filter and query options.</returns>
         PaginatedResult<TEntity> GetAll(
             QueryParamters paramters,
-            Expression<Func<TEntity, bool>> filter,
+            Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
 
@@ -39,7 +39,7 @@ namespace LinkDev.IKEA.DAL.Contracts.Repositories
         /// <param name="include">An optional function that includes related entities in the query.</param>
         /// <returns>The matching entity, or <see langword="null" /> if no entity is found.</returns>
         TEntity? Get(
-             Expression<Func<TEntity, bool>> filter,
+             Expression<Func<TEntity, bool>>? filter = null,
              Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
 
         void Add(TEntity entity);

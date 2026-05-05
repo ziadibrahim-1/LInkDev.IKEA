@@ -24,14 +24,15 @@ namespace LinkDev.IKEA.DAL.Persistence.Repositories
         public TEntity? Get(TKey id) => _dbSet.Find(id);
 
         
-        public TEntity? Get(Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
+        public TEntity? Get(Expression<Func<TEntity, bool>>? filter =null, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
         {
             IQueryable<TEntity> query = _dbSet; // // _dbcontext.Set<TEntity>().Include().Where();
 
             if (include != null)
                 query = include(query);
 
-            query = query.Where(filter);
+            if (filter != null)
+                query = query.Where(filter);
 
             return query.FirstOrDefault(); // Immediate execution to get the entity
         }
@@ -43,7 +44,7 @@ namespace LinkDev.IKEA.DAL.Persistence.Repositories
             return _dbSet.ToList();
         }
 
-        public PaginatedResult<TEntity> GetAll(QueryParamters paramters,Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
+        public PaginatedResult<TEntity> GetAll(QueryParamters paramters,Expression<Func<TEntity, bool>>? filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null, Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
         {
             IQueryable<TEntity> query = _dbSet;
             if(include != null)
