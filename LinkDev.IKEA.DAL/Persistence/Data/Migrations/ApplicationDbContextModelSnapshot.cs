@@ -114,6 +114,10 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateOnly>("HireDate")
                         .HasColumnType("date");
 
@@ -139,10 +143,6 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.Migrations
 
                     b.Property<decimal>("Salary")
                         .HasColumnType("decimal(9,2)");
-
-                    b.Property<string>("gender")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("image")
                         .HasColumnType("nvarchar(max)");

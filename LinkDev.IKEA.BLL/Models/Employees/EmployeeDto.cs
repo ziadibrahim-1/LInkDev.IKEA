@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace LinkDev.IKEA.BLL.Models.Employees
 {
-    public record EmployeeDto(int Id, string FirstName, string LastName,int? Age,
-        string? Email, string? PhoneNumber, string? Address,
+    public record EmployeeDto(int Id, string? DepartmentName,string FirstName, string LastName,int? Age,
+        string Email, string? PhoneNumber, string? Address,
         Decimal Salary, bool IsActive, DateOnly HireDate,
         Gender Gender, EmployeeType EmployeeType, int? DepartmentId,
         string? CreatedBy, DateTime CreatedOn, string? LastModifiedBy,

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LinkDev.IKEA.DAL.Persistence.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260501002014_Employee Module")]
-    partial class EmployeeModule
+    [Migration("20260506133018_Fix Gender")]
+    partial class FixGender
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -117,6 +117,10 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateOnly>("HireDate")
                         .HasColumnType("date");
 
@@ -142,10 +146,6 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.Migrations
 
                     b.Property<decimal>("Salary")
                         .HasColumnType("decimal(9,2)");
-
-                    b.Property<string>("gender")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("image")
                         .HasColumnType("nvarchar(max)");

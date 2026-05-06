@@ -1,0 +1,150 @@
+﻿@model EmployeeDetailsViewModel
+@{
+    ViewData["Title"] = "Employee Details";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb bg-transparent p-0 mb-0">
+            <li class="breadcrumb-item"><a asp-action="Index">Employees</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Details</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width:96px;height:96px;font-size:28px;font-weight:700;">
+                            @{
+                                var name = Model.FullName ?? string.Empty;
+                                var initials = string.Empty;
+                                if (!string.IsNullOrWhiteSpace(name))
+                                {
+                                    var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                    initials = parts.Length == 1 ? parts[0].Substring(0, 1).ToUpper() : (parts[0].Substring(0, 1) + parts[^1].Substring(0, 1)).ToUpper();
+                                }
+                            }
+                            @initials
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <h3 class="mb-1">@Model.FullName</h3>
+                            
+                            <p class="text-muted mb-1">@Model.EmployeeType • @Model.GenderName</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                @if (!string.IsNullOrEmpty(Model.Email))
+                                {
+                                    <a href="mailto:@Model.Email" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-envelope me-1"></i> Email
+                                    </a>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                                {
+                                    <a href="tel:@Model.PhoneNumber" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-phone me-1"></i> Call
+                                    </a>
+                                }
+                                <a class="btn btn-sm btn-outline-success" role="button" onclick="navigator.clipboard?.writeText('@(Model.Email ?? string.Empty)')">
+                                    <i class="fas fa-clipboard me-1"></i> Copy Email
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="text-end">
+                            <h5 class="mb-1">@Model.Salary.ToString("C")</h5>
+                            <small class="text-muted">Salary</small>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Personal</h6>
+                            <dl class="row">
+                                <dt class="col-5">Full name</dt>
+                                <dd class="col-7">@Model.FullName</dd>
+
+                                <dt class="col-5">Age</dt>
+                                <dd class="col-7">@Model.Age</dd>
+
+                                <dt class="col-5">Hire date</dt>
+                                <dd class="col-7">@Model.FormattedHireDate</dd>
+                            </dl>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Employment</h6>
+                            <dl class="row">
+                                <dt class="col-5">Department</dt>
+                                <dd class="col-7">@Model.DepartmentName <span class="text-muted">(@Model.DepartmentCode)</span></dd>
+
+                                <dt class="col-5">Years</dt>
+                                <dd class="col-7">@Model.YearsOfService</dd>
+
+                                <dt class="col-5">Status</dt>
+                                <dd class="col-7">
+                                    @if (Model.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3 shadow-sm">
+                <div class="card-header bg-light">
+                    <strong>Department</strong>
+                </div>
+                <div class="card-body">
+                    <h5 class="mb-1">@Model.DepartmentName</h5>
+                    <p class="text-muted small mb-2">Code: @Model.DepartmentCode</p>
+                    <p class="mb-0 text-muted">@Model.DepartmentDescription</p>
+                    <hr />
+                    <div class="d-flex justify-content-between small text-muted">
+                        <div>Manager: <strong class="text-body">@Model.ManagerDepartmentName</strong></div>
+                        <div>Service: <strong class="text-body">@Model.YearsOfService Years</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card sticky-top shadow-sm" style="top:1rem">
+                <div class="card-body">
+                    <div class="mb-3 d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted">Created</small>
+                            <div class="fw-semibold">@Model.CreatedBy ?? "-"</div>
+                            <small class="text-muted">@Model.CreatedDate.ToString("g")</small>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">Last Updated</small>
+                            <div class="fw-semibold">@Model.LastModifiedBy ?? "-"</div>
+                            <small class="text-muted">@Model.LastModifiedDate?.ToString("g")</small>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </a>
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i> Back
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

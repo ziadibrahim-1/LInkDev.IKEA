@@ -6,16 +6,31 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LinkDev.IKEA.DAL.Persistence.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class EmployeeModule : Migration
+    public partial class FixGender : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "ManagerId",
-                table: "Departments",
-                type: "int",
-                nullable: true);
+            migrationBuilder.CreateTable(
+                name: "Departments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "10, 10"),
+                    Name = table.Column<string>(type: "varchar(100)", nullable: false),
+                    Description = table.Column<string>(type: "varchar(200)", nullable: true),
+                    Code = table.Column<string>(type: "varchar(10)", nullable: false),
+                    CreationDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    ManagerId = table.Column<int>(type: "int", nullable: true),
+                    CreatedBy = table.Column<string>(type: "varchar(50)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    LastModifiedBy = table.Column<string>(type: "varchar(50)", nullable: false),
+                    LastModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: false, computedColumnSql: "GETUTCDATE()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Departments", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Employees",
@@ -32,7 +47,7 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.Migrations
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HireDate = table.Column<DateOnly>(type: "date", nullable: false),
-                    gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EmployeeType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DepartmentId = table.Column<int>(type: "int", nullable: true),
                     image = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -83,13 +98,8 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.Migrations
             migrationBuilder.DropTable(
                 name: "Employees");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Departments_ManagerId",
-                table: "Departments");
-
-            migrationBuilder.DropColumn(
-                name: "ManagerId",
-                table: "Departments");
+            migrationBuilder.DropTable(
+                name: "Departments");
         }
     }
 }

@@ -18,9 +18,9 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.Configurations.Employees
             builder.Property(E => E.Email).HasMaxLength(100);
             builder.Property(E => E.Address).HasMaxLength(200);
             builder.Property(E => E.Salary).HasColumnType("decimal(9,2)");
-            builder.Property(E => E.gender).HasConversion(
-                (gender) => gender.ToString(),
-                (gender) => Enum.Parse<Gender>(gender)
+            builder.Property(E => E.Gender).HasConversion(
+                (Gender) => Gender.ToString(),
+                (Gender) => Enum.Parse<Gender>(Gender)
             );
 
             builder.HasOne(E=>E.Department)

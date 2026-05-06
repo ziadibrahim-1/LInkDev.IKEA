@@ -1,6 +1,7 @@
 ﻿using LinkDev.IKEA.BLL.Models.Departments;
 using LinkDev.IKEA.BLL.Models.Employees;
 using LinkDev.IKEA.DAL.Contracts;
+using LinkDev.IKEA.DAL.Entities.Departments;
 using LinkDev.IKEA.DAL.Entities.Employees;
 using LinkDev.IKEA.DAL.Persistence.Common;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ namespace LinkDev.IKEA.BLL.Services.Employees
             if (employee is null)
                 return null;
 
-            var employeeDto = new EmployeeDto(employee.Id, employee.FirstName, employee.LastName, employee.Age, employee.Email, employee.PhoneNumber, employee.Address, employee.Salary, employee.IsActive, employee.HireDate, employee.gender, employee.EmployeeType, employee.DepartmentId, employee.CreatedBy, employee.CreatedOn, employee.LastModifiedBy, employee.LastModifiedOn);
+            var employeeDto = new EmployeeDto(employee.Id,employee.Department?.Name ,employee.FirstName, employee.LastName, employee.Age, employee.Email??string.Empty, employee.PhoneNumber, employee.Address, employee.Salary, employee.IsActive, employee.HireDate, employee.Gender, employee.EmployeeType, employee.DepartmentId, employee.CreatedBy, employee.CreatedOn, employee.LastModifiedBy, employee.LastModifiedOn);
             return employeeDto;
         }
 
@@ -35,11 +36,11 @@ namespace LinkDev.IKEA.BLL.Services.Employees
             if (employee is null)
                 return null;
 
-            var employeeDto = new EmployeeDto(employee.Id, employee.FirstName, employee.LastName, employee.Age, employee.Email, employee.PhoneNumber, employee.Address, employee.Salary, employee.IsActive, employee.HireDate, employee.gender, employee.EmployeeType, employee.DepartmentId, employee.CreatedBy, employee.CreatedOn, employee.LastModifiedBy, employee.LastModifiedOn);
+            var employeeDto = new EmployeeDto(employee.Id, employee.Department?.Name,employee.FirstName, employee.LastName, employee.Age, employee.Email ??string.Empty, employee.PhoneNumber, employee.Address, employee.Salary, employee.IsActive, employee.HireDate, employee.Gender, employee.EmployeeType, employee.DepartmentId, employee.CreatedBy, employee.CreatedOn, employee.LastModifiedBy, employee.LastModifiedOn);
 
             DepartmentDto DepartmentDto = default!;
             if (employee.Department != null)
-                DepartmentDto = new DepartmentDto(employee.Department.Id ,employee.Department.Name, employee.Department.Code, employee.Department.CreationDate);
+                DepartmentDto = new DepartmentDto(employee.Department.Id ,employee.Department.Name,employee.Department.Description, employee.Department.Code, employee.Department.CreationDate, $"{employee.Department.Manager?.FirstName} {employee.Department.Manager?.LastName}");
 
             var yearsOfExperience = CalculateYearsOfExperience(employee.HireDate, DateOnly.FromDateTime(DateTime.Now));
 
@@ -63,7 +64,7 @@ namespace LinkDev.IKEA.BLL.Services.Employees
                 );
             var resultDto = new PaginatedResult<EmployeeDto>()
             {
-                date = result.date.Select(employee => new EmployeeDto(employee.Id, employee.FirstName, employee.LastName, employee.Age, employee.Email, employee.PhoneNumber, employee.Address, employee.Salary, employee.IsActive, employee.HireDate, employee.gender, employee.EmployeeType, employee.DepartmentId, employee.CreatedBy, employee.CreatedOn, employee.LastModifiedBy, employee.LastModifiedOn)),
+                date = result.date.Select(employee => new EmployeeDto(employee.Id, employee.Department?.Name,employee.FirstName, employee.LastName, employee.Age, employee.Email ?? string.Empty, employee.PhoneNumber, employee.Address, employee.Salary, employee.IsActive, employee.HireDate, employee.Gender, employee.EmployeeType, employee.DepartmentId, employee.CreatedBy, employee.CreatedOn, employee.LastModifiedBy, employee.LastModifiedOn)),
                 PageIndex = result.PageIndex,
                 PageSize = result.PageSize,
                 TotalCount = result.TotalCount,
@@ -71,7 +72,7 @@ namespace LinkDev.IKEA.BLL.Services.Employees
             return resultDto;
         }
 
-        public void CreateEmployee(CreateEmployeeDto employeeDto)
+        public int CreateEmployee(CreateEmployeeDto employeeDto)
         {
             validateCreateEmployeeBusinissRules(employeeDto);
 
@@ -84,7 +85,7 @@ namespace LinkDev.IKEA.BLL.Services.Employees
                 DepartmentId = employeeDto.DepartmentId,
                 Email = employeeDto.Email,
                 PhoneNumber = employeeDto.PhoneNumber,
-                gender = employeeDto.Gender,
+                Gender = employeeDto.Gender,
                 EmployeeType = employeeDto.EmployeeType,
                 Salary = employeeDto.Salary,
                 CreatedBy = "",
@@ -94,15 +95,15 @@ namespace LinkDev.IKEA.BLL.Services.Employees
             employee.IsActive = true;
 
             _unitOfWork.Employees.Add(employee);
-            _unitOfWork.Complete();
+            return _unitOfWork.Complete();
         }
 
 
-        public void UpdateEmployee(UpdateEmployeeDto employeeDto)
+        public int UpdateEmployee(UpdateEmployeeDto employeeDto)
         {
             var ExistingEmployee = _unitOfWork.Employees.Get(employeeDto.Id);
             if (ExistingEmployee is null)
-                return;
+                return -1;
             validateUpdateEmployeeBusinissRules(employeeDto, ExistingEmployee);
 
             ExistingEmployee.FirstName = employeeDto.FirstName;
@@ -111,19 +112,19 @@ namespace LinkDev.IKEA.BLL.Services.Employees
             ExistingEmployee.DepartmentId = employeeDto.DepartmentId;
             ExistingEmployee.Email = employeeDto.Email;
             ExistingEmployee.PhoneNumber = employeeDto.PhoneNumber;
-            ExistingEmployee.gender = employeeDto.Gender;
+            ExistingEmployee.Gender = employeeDto.Gender;
             ExistingEmployee.EmployeeType = employeeDto.EmployeeType;
             ExistingEmployee.IsActive = employeeDto.IsActive;
 
             _unitOfWork.Employees.Update(ExistingEmployee);
-            _unitOfWork.Complete();
+            return _unitOfWork.Complete();
         }
 
        
-        public void DeleteEmployee(int id)
+        public int DeleteEmployee(int id)
         {
             _unitOfWork.Employees.Delete(id);
-            _unitOfWork.Complete();  
+            return _unitOfWork.Complete();  
         }
 
         #region Helper Methods
@@ -137,10 +138,10 @@ namespace LinkDev.IKEA.BLL.Services.Employees
                 if(department is null)
                     throw new Exception($"Department with ID {employeeDto.DepartmentId} does not exist.");
 
-                int MinAge = 18;
-                var age =  DateTime.Now.Year - employeeDto.HireDate.Year;
-                if(age < MinAge)
-                    throw new Exception($"Employee must be at least {MinAge} years old.");
+                //int MinAge = 18;
+                //var age =  DateTime.Now.Year - employeeDto.HireDate.Year;
+                //if(age < MinAge)
+                //    throw new Exception($"Employee must be at least {MinAge} years old.");
 
                 if(employeeDto.Salary < 5_000)
                     throw new Exception("Salary must be at least 5000.");
@@ -156,9 +157,11 @@ namespace LinkDev.IKEA.BLL.Services.Employees
                     throw new Exception($"Department with ID {employeeDto.DepartmentId} does not exist.");
 
                 var expectedSalary = ExistingEmployee.Salary * 1.1m;
-
-                if (employeeDto.Salary < expectedSalary)
-                    throw new Exception("Salary must be at least 10% higher than the current salary.");
+                if(employeeDto.Salary != ExistingEmployee.Salary && employeeDto.Salary < expectedSalary)
+                {
+                    if (employeeDto.Salary < expectedSalary)
+                        throw new Exception($"Salary must be at least 10% higher than the current salary. Expected: {expectedSalary}");
+                }
             }
         }
         private static int CalculateYearsOfExperience(DateOnly hireDate, DateOnly referenceDate)

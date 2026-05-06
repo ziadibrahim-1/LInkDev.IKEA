@@ -49,8 +49,9 @@ namespace LinkDev.IKEA.DAL.Persistence.Repositories
             IQueryable<TEntity> query = _dbSet;
             if(include != null)
                 query = include(query);
-
-            query = query.Where(filter);
+           
+            if (filter != null)
+                query = query.Where(filter);
 
             // get the total count before applying Ordring and pagination
             var TotalCount = query.Count();

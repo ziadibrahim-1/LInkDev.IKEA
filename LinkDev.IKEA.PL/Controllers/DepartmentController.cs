@@ -13,11 +13,13 @@ namespace LinkDev.IKEA.PL.Controllers
         private readonly ILogger<DepartmentController> _logger;
         #region Services
         private readonly IDepartmentService _departmentService;
+        private readonly IWebHostEnvironment _environment;
 
-        public DepartmentController(ILogger<DepartmentController> logger, IDepartmentService departmentService)
+        public DepartmentController(ILogger<DepartmentController> logger, IDepartmentService departmentService,IWebHostEnvironment environment)
         {
             _logger = logger;
             _departmentService = departmentService;
+            _environment = environment;
         }
         #endregion
 
@@ -68,12 +70,15 @@ namespace LinkDev.IKEA.PL.Controllers
         public IActionResult Create(CreateDepartmentViewModel model)
         {
             string message = "Department Created Successfully";
+            if(model != null)
+
             try
             {
                 if (!ModelState.IsValid)
                     return View(model);
+                
 
-                var DepartmentToCreate = new CreateDepartmentDto(model.Name, model.Description, model.Code, model.CreationDate);
+                var DepartmentToCreate = new CreateDepartmentDto(model.Name?? string.Empty, model.Description, model.Code ?? string.Empty, model.CreationDate);
 
                 var created = _departmentService.CreateDepartment(DepartmentToCreate) > 0;
 
@@ -86,7 +91,10 @@ namespace LinkDev.IKEA.PL.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, ex.StackTrace!.ToString());
-                message = "An error occurred while creating the Department";
+                if (_environment.IsDevelopment())
+                    message = ex.Message;
+                else
+                    message = $"An error occurred while creating the Department";
 
             }
             TempData["Message"] = message;
@@ -144,7 +152,10 @@ namespace LinkDev.IKEA.PL.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, ex.StackTrace!.ToString());
-                message = "An error occurred while updating the Department";
+                if (_environment.IsDevelopment())
+                    message = ex.Message;
+                else
+                    message = $"An error occurred while updating the Department";
             }
             TempData["Message"] = message;
             return RedirectToAction(nameof(Index));
@@ -165,7 +176,10 @@ namespace LinkDev.IKEA.PL.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message, ex.StackTrace!.ToString());
-                message = "An error occurred while deleting the Department";
+                if (_environment.IsDevelopment())
+                    message = ex.Message;
+                else
+                    message = $"An error occurred while Deleting the Department";
             }
             TempData["Message"] = message;
             return RedirectToAction(nameof(Index));

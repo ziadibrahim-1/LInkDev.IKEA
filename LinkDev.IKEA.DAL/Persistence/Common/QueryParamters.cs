@@ -11,7 +11,7 @@ namespace LinkDev.IKEA.DAL.Persistence.Common
         private const int MaxPageSize = 20;
         public int PageIndex { get; set; } = 1;
 
-        public string? SearchTerm { get; set; }
+        //public string? SearchTerm { get; set; }
 
         private int _pageSize = 10;
         public int PageSize

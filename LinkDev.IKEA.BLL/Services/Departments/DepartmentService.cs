@@ -30,7 +30,7 @@ namespace LinkDev.IKEA.BLL.Services.Departments
 
             foreach (var department in departments)
             {
-                yield return new DepartmentDto(department.Id, department.Name, department.Code, department.CreationDate);
+                yield return new DepartmentDto(department.Id, department.Name, department.Description,department.Code, department.CreationDate, $"{department.Manager?.FirstName} {department.Manager?.LastName}");
             }
 
         }
