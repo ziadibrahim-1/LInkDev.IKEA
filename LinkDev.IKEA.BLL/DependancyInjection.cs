@@ -1,12 +1,8 @@
-﻿using LinkDev.IKEA.BLL.Services.Departments;
+﻿using LinkDev.IKEA.BLL.Mapping;
+using LinkDev.IKEA.BLL.Services.Departments;
 using LinkDev.IKEA.BLL.Services.Employees;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using System.Reflection;
 namespace LinkDev.IKEA.BLL
 {
     public static class DependancyInjection
@@ -15,6 +11,9 @@ namespace LinkDev.IKEA.BLL
         {
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
+            // Add AutoMapper with high version of Auttomapper based on the Offesial web site
+            services.AddAutoMapper(M => { } , typeof(EmployeeProfile));
+
             return services;
         }
     }

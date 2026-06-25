@@ -13,7 +13,7 @@ namespace LinkDev.IKEA.PL
 
             #region Services
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddWebServvices();
 
             //builder.Services.AddPersistenceServices(builder.Configuration);
             //builder.Services.AddPersistenceServices(builder.Configuration);

@@ -1,4 +1,5 @@
-﻿using LinkDev.IKEA.BLL.Models.Departments;
+﻿using AutoMapper;
+using LinkDev.IKEA.BLL.Models.Departments;
 using LinkDev.IKEA.BLL.Models.Employees;
 using LinkDev.IKEA.DAL.Contracts;
 using LinkDev.IKEA.DAL.Entities.Departments;
@@ -11,10 +12,12 @@ namespace LinkDev.IKEA.BLL.Services.Employees
     public class EmployeeService : IEmployeeService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public EmployeeService(IUnitOfWork unitOfWork)
+        public EmployeeService(IUnitOfWork unitOfWork , IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
         public EmployeeDto? GetEmployeeById(int id)
         {
@@ -22,12 +25,14 @@ namespace LinkDev.IKEA.BLL.Services.Employees
             if (employee is null)
                 return null;
 
-            var employeeDto = new EmployeeDto(employee.Id,employee.Department?.Name ,employee.FirstName, employee.LastName, employee.Age, employee.Email??string.Empty, employee.PhoneNumber, employee.Address, employee.Salary, employee.IsActive, employee.HireDate, employee.Gender, employee.EmployeeType, employee.DepartmentId, employee.CreatedBy, employee.CreatedOn, employee.LastModifiedBy, employee.LastModifiedOn);
+            //var employeeDto = new EmployeeDto(employee.Id,employee.Department?.Name ,employee.FirstName, employee.LastName, employee.Age, employee.Email??string.Empty, employee.PhoneNumber, employee.Address, employee.Salary, employee.IsActive, employee.HireDate, employee.Gender, employee.EmployeeType, employee.DepartmentId, employee.CreatedBy, employee.CreatedOn, employee.LastModifiedBy, employee.LastModifiedOn);
+            var employeeDto = _mapper.Map<EmployeeDto>(employee);
             return employeeDto;
         }
 
         public EmployeeDetailsDto? EmployeeDetailsDto(int id)
         {
+            // i Want to modify quering data in REpository not Serverice
             var employee = _unitOfWork.Employees.Get(
                 filter: E=> E.Id == id,
                 include: E => E.Include(E => E.Department)
@@ -36,12 +41,10 @@ namespace LinkDev.IKEA.BLL.Services.Employees
             if (employee is null)
                 return null;
 
-            var employeeDto = new EmployeeDto(employee.Id, employee.Department?.Name,employee.FirstName, employee.LastName, employee.Age, employee.Email ??string.Empty, employee.PhoneNumber, employee.Address, employee.Salary, employee.IsActive, employee.HireDate, employee.Gender, employee.EmployeeType, employee.DepartmentId, employee.CreatedBy, employee.CreatedOn, employee.LastModifiedBy, employee.LastModifiedOn);
 
-            DepartmentDto DepartmentDto = default!;
-            if (employee.Department != null)
-                DepartmentDto = new DepartmentDto(employee.Department.Id ,employee.Department.Name,employee.Department.Description, employee.Department.Code, employee.Department.CreationDate, $"{employee.Department.Manager?.FirstName} {employee.Department.Manager?.LastName}");
-
+            var employeeDto = _mapper.Map<EmployeeDto>(employee);
+            
+            var DepartmentDto = _mapper.Map<DepartmentDto>(employee.Department);
             var yearsOfExperience = CalculateYearsOfExperience(employee.HireDate, DateOnly.FromDateTime(DateTime.Now));
 
             var employeeDetailsDto = new EmployeeDetailsDto(employeeDto , DepartmentDto , yearsOfExperience);
@@ -56,15 +59,11 @@ namespace LinkDev.IKEA.BLL.Services.Employees
             if(paramters.PageSize > 20)
                 paramters.PageSize = 20;
 
-            var result = _unitOfWork.Employees.GetAll(
-                paramters: paramters,
-                include: E => E.Include(E => E.Department)
-                //filter: E => E.FirstName.Contains(paramters.SearchTerm)
-                //orderBy: E => E.OrderBy(E => E.Age),
-                );
+            var result = _unitOfWork.Employees.GetAll(paramters: paramters);
+            var employeeDto = _mapper.Map<IEnumerable<EmployeeDto>>(result.date);
             var resultDto = new PaginatedResult<EmployeeDto>()
             {
-                date = result.date.Select(employee => new EmployeeDto(employee.Id, employee.Department?.Name,employee.FirstName, employee.LastName, employee.Age, employee.Email ?? string.Empty, employee.PhoneNumber, employee.Address, employee.Salary, employee.IsActive, employee.HireDate, employee.Gender, employee.EmployeeType, employee.DepartmentId, employee.CreatedBy, employee.CreatedOn, employee.LastModifiedBy, employee.LastModifiedOn)),
+                date = employeeDto,
                 PageIndex = result.PageIndex,
                 PageSize = result.PageSize,
                 TotalCount = result.TotalCount,
@@ -76,23 +75,9 @@ namespace LinkDev.IKEA.BLL.Services.Employees
         {
             validateCreateEmployeeBusinissRules(employeeDto);
 
-            var employee = new Employee()
-            {
-                FirstName = employeeDto.FirstName,
-                LastName = employeeDto.LastName,
-                Address = employeeDto.Address,
-                Age = DateTime.Now.Year - employeeDto.HireDate.Year,
-                DepartmentId = employeeDto.DepartmentId,
-                Email = employeeDto.Email,
-                PhoneNumber = employeeDto.PhoneNumber,
-                Gender = employeeDto.Gender,
-                EmployeeType = employeeDto.EmployeeType,
-                Salary = employeeDto.Salary,
-                CreatedBy = "",
-                LastModifiedBy = "",
-            };
-            employee.HireDate = DateOnly.FromDateTime(DateTime.Now);
-            employee.IsActive = true;
+            var employee = _mapper.Map<Employee>(employeeDto);
+            //employee.HireDate = DateOnly.FromDateTime(DateTime.Now);
+            //employee.IsActive = true;
 
             _unitOfWork.Employees.Add(employee);
             return _unitOfWork.Complete();
@@ -174,6 +159,20 @@ namespace LinkDev.IKEA.BLL.Services.Employees
             }
 
             return Math.Max(0, years);
+        }
+
+        public bool ChangeEmployeeStatus(int id, bool IsActive)
+        {
+            var employee = _unitOfWork.Employees.Get(id);
+            if(employee is null)
+                return false;
+            if(employee.IsActive == IsActive)
+                throw new Exception($"Employee with ID {id} is already {(IsActive ? "active" : "inactive")}.");
+
+            employee.IsActive = IsActive;
+            _unitOfWork.Employees.Update(employee);
+            _unitOfWork.Complete();
+            return true;
         }
         #endregion
     }

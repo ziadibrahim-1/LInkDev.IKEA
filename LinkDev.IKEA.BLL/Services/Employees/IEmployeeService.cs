@@ -13,6 +13,7 @@ namespace LinkDev.IKEA.BLL.Services.Employees
 
         int CreateEmployee(CreateEmployeeDto employeeDto);
         int UpdateEmployee(UpdateEmployeeDto employeeDto);
+        bool ChangeEmployeeStatus(int id, bool IsActive);
         int DeleteEmployee(int id);
     }
 }

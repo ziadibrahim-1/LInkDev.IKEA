@@ -1,59 +1,75 @@
-﻿using LinkDev.IKEA.BLL.Models.Employees;
+﻿using AutoMapper;
+using LinkDev.IKEA.BLL.Models.Employees;
 using LinkDev.IKEA.BLL.Services.Departments;
 using LinkDev.IKEA.BLL.Services.Employees;
 using LinkDev.IKEA.DAL.Persistence.Common;
 using LinkDev.IKEA.PL.Models.Employee;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace LinkDev.IKEA.PL.Controllers
 {
+    [Authorize]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeService _EmployeeService;
+        private readonly IMapper _mapper;
         private readonly ILogger<EmployeeController> _logger;
         private readonly IWebHostEnvironment _environment;
 
-        public EmployeeController(IEmployeeService EmployeeService, ILogger<EmployeeController> logger, IWebHostEnvironment environment)
+        public EmployeeController(IEmployeeService EmployeeService, ILogger<EmployeeController> logger, IWebHostEnvironment environment , IMapper mapper)
         {
             _EmployeeService = EmployeeService;
+            _mapper = mapper;
             _logger = logger;
             _environment = environment;
         }
         [HttpGet] // GET: Employee/Index
-        public IActionResult Index(int pageIndex = 1, int pageSize = 10)
+        public IActionResult Index(string searchTerm = "", string SortedBy = "name", bool SortAscynding = true, int pageIndex = 1, int pageSize = 10)
         {
             var queryParamters = new QueryParamters
             {
                 PageIndex = pageIndex,
-                PageSize = pageSize
+                PageSize = pageSize,
+                SearchTerm = searchTerm,
+                SortedBy = SortedBy,
+                SortAscynding = SortAscynding
+
             };
             var employees = _EmployeeService.GetEmployees(queryParamters);
+            var employeeViewModel = _mapper.Map<IEnumerable<EmployeeViewModel>>(employees.date);
 
             var model = new EmployeeListViewModel()
             {
-                Employees = employees.date.Select(E => new EmployeeViewModel()
-                {
-                    Id = E.Id,
-                    FullName = $"{E.FirstName} {E.LastName}",
-                    Address = E.Address,
-                    Age = E.Age,
-                    CreatedBy = E.CreatedBy,
-                    CreatedOn = E.CreatedOn,
-                    Email = E.Email,
-                    EmployeeType = E.EmployeeType,
-                    Gender = E.Gender,
-                    IsActive = E.IsActive,
-                    FormattedHireDate = E.FormattedHIreDate,
-                    ModifiedBy = E.LastModifiedBy,
-                    ModifiedOn = E.LastModifiedOn,
-                    PhoneNumber = E.PhoneNumber,
-                    Salary = E.Salary,
-                    Department = E.DepartmentName
-                }),
+                Employees = employeeViewModel,
+                ///Employees = employees.date.Select(E => new EmployeeViewModel()
+                ///{
+                ///    Id = E.Id,
+                ///    FullName = $"{E.FirstName} {E.LastName}",
+                ///    Address = E.Address,
+                ///    Age = E.Age,
+                ///    CreatedBy = E.CreatedBy,
+                ///    CreatedOn = E.CreatedOn,
+                ///    Email = E.Email,
+                ///    EmployeeType = E.EmployeeType,
+                ///    Gender = E.Gender,
+                ///    IsActive = E.IsActive,
+                ///    FormattedHireDate = E.FormattedHIreDate,
+                ///    ModifiedBy = E.LastModifiedBy,
+                ///    ModifiedOn = E.LastModifiedOn,
+                ///    PhoneNumber = E.PhoneNumber,
+                ///    Salary = E.Salary,
+                ///    Department = E.DepartmentName
+                ///}),
                 Page = pageIndex,
                 PageSize = pageSize,
-                TotalCount = employees.TotalCount
+                TotalCount = employees.TotalCount,
+                SearchTerm = searchTerm,
+                SortAscynding = SortAscynding,
+                SortedBy = SortedBy
+
             };
 
 
@@ -69,32 +85,34 @@ namespace LinkDev.IKEA.PL.Controllers
             if (employee is null)
                 return NotFound();
 
-            var model = new EmployeeDetailsViewModel()
-            {
-                Id = employee.Employee.Id,
-                FirstName = employee.Employee.FirstName,
-                LastName = employee.Employee.LastName,
-                Address = employee.Employee.Address,
-                Age = employee.Employee.Age,
-                CreatedBy = employee.Employee.CreatedBy,
-                CreatedDate = employee.Employee.CreatedOn,
-                DepartmentCode = employee.Department.Code,
-                DepartmentId = employee.Department.Id,
-                DepartmentName = employee.Department.Name,
-                Email = employee.Employee.Email,
-                EmployeeType = employee.Employee.EmployeeType,
-                FormattedHireDate = employee.Employee.FormattedHIreDate,
-                Gender = employee.Employee.Gender,
-                IsActive = employee.Employee.IsActive,
-                LastModifiedBy = employee.Employee.LastModifiedBy,
-                LastModifiedDate = employee.Employee.LastModifiedOn,
-                PhoneNumber = employee.Employee.PhoneNumber,
-                Salary = employee.Employee.Salary,
-                YearsOfService = employee.YearsOfExperience,
-                ManagerDepartmentName = employee.Department.Manager,
-                DepartmentDescription = employee.Department.Description
+            var model = _mapper.Map<EmployeeDetailsViewModel>(employee);
 
-            };
+            ///var model = new EmployeeDetailsViewModel()
+            ///{
+            ///    Id = employee.Employee.Id,
+            ///    FirstName = employee.Employee.FirstName,
+            ///    LastName = employee.Employee.LastName,
+            ///    Address = employee.Employee.Address,
+            ///    Age = employee.Employee.Age,
+            ///    CreatedBy = employee.Employee.CreatedBy,
+            ///    CreatedDate = employee.Employee.CreatedOn,
+            ///    DepartmentCode = employee.Department.Code,
+            ///    DepartmentId = employee.Department.Id,
+            ///    DepartmentName = employee.Department.Name,
+            ///    Email = employee.Employee.Email,
+            ///    EmployeeType = employee.Employee.EmployeeType,
+            ///    FormattedHireDate = employee.Employee.FormattedHIreDate,
+            ///    Gender = employee.Employee.Gender,
+            ///    IsActive = employee.Employee.IsActive,
+            ///    LastModifiedBy = employee.Employee.LastModifiedBy,
+            ///    LastModifiedDate = employee.Employee.LastModifiedOn,
+            ///    PhoneNumber = employee.Employee.PhoneNumber,
+            ///    Salary = employee.Employee.Salary,
+            ///    YearsOfService = employee.YearsOfExperience,
+            ///    ManagerDepartmentName = employee.Department.Manager,
+            ///    DepartmentDescription = employee.Department.Description
+            ///
+            ///};
             return View(model);
 
 
@@ -118,7 +136,8 @@ namespace LinkDev.IKEA.PL.Controllers
             var message = "Employee created successfully";
             try
             {
-                var EmployeeToCreate = new CreateEmployeeDto(createViewModel.FirstName, createViewModel.LastName, createViewModel.Email, createViewModel.PhoneNumber, createViewModel.Address, createViewModel.Salary, createViewModel.HireDate, createViewModel.Gender, createViewModel.EmployeeType, createViewModel.DepartmentId);
+                //var EmployeeToCreate = new CreateEmployeeDto(createViewModel.FirstName, createViewModel.LastName, createViewModel.Email, createViewModel.PhoneNumber, createViewModel.Address, createViewModel.Salary, createViewModel.HireDate, createViewModel.Gender, createViewModel.EmployeeType, createViewModel.DepartmentId);
+                var EmployeeToCreate = _mapper.Map<CreateEmployeeDto>(createViewModel);
                 var created = _EmployeeService.CreateEmployee(EmployeeToCreate) > 0;
                 if (!created)
                     message = $"Failed To Create Employee {EmployeeToCreate.FirstName} {EmployeeToCreate.LastName}";
@@ -143,21 +162,23 @@ namespace LinkDev.IKEA.PL.Controllers
             var employee = _EmployeeService.GetEmployeeById(id);
             if (employee is null)
                 return NotFound();
-            var model = new EmployeeEditViewModel()
-            {
-                Address = employee.Address,
-                DepartmentId = employee.DepartmentId,
-                EmployeeType = employee.EmployeeType,
-                Email = employee.Email,
-                FirstName = employee.FirstName,
-                Gender = employee.Gender,
-                Id = employee.Id,
-                IsActive = employee.IsActive,
-                LastName = employee.LastName,
-                PhoneNumber = employee.PhoneNumber,
-                Salary = employee.Salary,
 
-            };
+            var model = _mapper.Map<EmployeeEditViewModel>(employee);
+            ///var model = new EmployeeEditViewModel()
+            ///{
+            ///    Address = employee.Address,
+            ///    DepartmentId = employee.DepartmentId,
+            ///    EmployeeType = employee.EmployeeType,
+            ///    Email = employee.Email,
+            ///    FirstName = employee.FirstName,
+            ///    Gender = employee.Gender,
+            ///    Id = employee.Id,
+            ///    IsActive = employee.IsActive,
+            ///    LastName = employee.LastName,
+            ///    PhoneNumber = employee.PhoneNumber,
+            ///    Salary = employee.Salary,
+            ///
+            ///};
             TempData["Id"] = id;
             return View(model);
         }
@@ -177,13 +198,14 @@ namespace LinkDev.IKEA.PL.Controllers
             var message = "Employee Edit Successfuly";
             try
             {
-                var employeeToCreate = new UpdateEmployeeDto(employeeEditViewModel.Id,
-                      employeeEditViewModel.FirstName,
-                      employeeEditViewModel.LastName, employeeEditViewModel.Address,
-                      employeeEditViewModel.Salary, employeeEditViewModel.Email, employeeEditViewModel.PhoneNumber,
-                      employeeEditViewModel.IsActive, employeeEditViewModel.Gender, employeeEditViewModel.EmployeeType,
-                      employeeEditViewModel.DepartmentId
-                      );
+                var employeeToCreate = _mapper.Map<UpdateEmployeeDto>(employeeEditViewModel);
+                ///var employeeToCreate = new UpdateEmployeeDto(employeeEditViewModel.Id,
+                ///      employeeEditViewModel.FirstName,
+                ///      employeeEditViewModel.LastName, employeeEditViewModel.Address,
+                ///      employeeEditViewModel.Salary, employeeEditViewModel.Email, employeeEditViewModel.PhoneNumber,
+                ///      employeeEditViewModel.IsActive, employeeEditViewModel.Gender, employeeEditViewModel.EmployeeType,
+                ///      employeeEditViewModel.DepartmentId
+                ///      );
 
                 var updated = _EmployeeService.UpdateEmployee(employeeToCreate) > 0;
                 if (!updated)
@@ -199,6 +221,34 @@ namespace LinkDev.IKEA.PL.Controllers
                 else
                     message = $"An error occurred while Editing the Employee";
             }
+            TempData["Message"] = message;
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpPost]
+        public IActionResult ToggleStatus(int id, bool isActive)
+        {
+            if (id <= 0)
+                return BadRequest();
+            var message = "";
+            try
+            {
+                var emp = _EmployeeService.ChangeEmployeeStatus(id, isActive);
+                message = $"Employee with id {id} has been {(isActive ? "Activated" : "Deactivated")} successfully";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex.StackTrace!.ToString());
+                if (_environment.IsDevelopment())
+                {
+                    message = ex.Message;
+                }
+                else
+                    message = $"An error occurred while changing the status of the Employee with id {id}";
+
+            }
+            TempData["Message"] = message;
             return RedirectToAction(nameof(Index));
         }
 

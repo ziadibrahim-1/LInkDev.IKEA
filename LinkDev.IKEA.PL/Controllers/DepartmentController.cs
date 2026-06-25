@@ -1,6 +1,7 @@
 ﻿using LinkDev.IKEA.BLL.Models.Departments;
 using LinkDev.IKEA.BLL.Services.Departments;
 using LinkDev.IKEA.PL.Models.Department;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LinkDev.IKEA.PL.Controllers
@@ -8,6 +9,7 @@ namespace LinkDev.IKEA.PL.Controllers
     // 
     // Inheritance Department Controller is a Controller
     // Compstion : DepartmentController has a IDepartmentService
+    [Authorize]
     public class DepartmentController : Controller
     {
         private readonly ILogger<DepartmentController> _logger;

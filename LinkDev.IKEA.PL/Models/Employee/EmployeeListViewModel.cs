@@ -11,6 +11,11 @@
 
         public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
 
+        public string? SearchTerm { get; set; }
+        public string? SortedBy { get; set; }
+        public bool SortAscynding { get; set; }
+        public bool ApplyOrder { get; set; }
+
 
     }
 }
