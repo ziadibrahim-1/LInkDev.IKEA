@@ -3,6 +3,7 @@ using LinkDev.IKEA.DAL.Entities.Identity;
 using LinkDev.IKEA.PL.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace LinkDev.IKEA.PL.Controllers
 {
@@ -122,14 +123,14 @@ namespace LinkDev.IKEA.PL.Controllers
         }
 
         [HttpPost]
-        public IActionResult SendRestPasswordUrl(ForgetPasswordViewModel forgetPasswordViewModel)
+        public async Task<IActionResult> SendRestPasswordUrl(ForgetPasswordViewModel forgetPasswordViewModel)
         {
             if (ModelState.IsValid)
             {
-                var user = _userManager.FindByEmailAsync(forgetPasswordViewModel.Email).Result;
+                var user = await _userManager.FindByEmailAsync(forgetPasswordViewModel.Email);
                 if (user != null)
                 {
-                    var token = _userManager.GeneratePasswordResetTokenAsync(user).Result;
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                     var url = Url.Action("ChangePassword", "Account", new { email = forgetPasswordViewModel.Email, token }, Request.Scheme);
                     var email = new Email()
                     {
@@ -143,7 +144,7 @@ namespace LinkDev.IKEA.PL.Controllers
             }
             else
             {
-                               ModelState.AddModelError(string.Empty, "Invalid operation please try again.");
+                ModelState.AddModelError(string.Empty, "Invalid operation please try again.");
             }
             return View(forgetPasswordViewModel);
         }
@@ -172,7 +173,7 @@ namespace LinkDev.IKEA.PL.Controllers
 
 
         [HttpPost]
-        public IActionResult ChangePassword(ChangePasswordViewModel model)
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             var email = TempData["email"] as string;
             var token = TempData["token"] as string;
@@ -183,13 +184,13 @@ namespace LinkDev.IKEA.PL.Controllers
             }
             if (!ModelState.IsValid)
                 return View(model);
-            var user = _userManager.FindByEmailAsync(email).Result;
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 ModelState.AddModelError(string.Empty, "User not found.");
                 return View(model);
             }
-            var result = _userManager.ResetPasswordAsync(user, token, model.NewPassword).Result;
+            var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
             if (result.Succeeded)
             {
                 return RedirectToAction(nameof(SignIn));

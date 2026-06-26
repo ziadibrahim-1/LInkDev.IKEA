@@ -5,6 +5,7 @@ using LinkDev.IKEA.PL.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace LinkDev.IKEA.PL.Controllers
 {
@@ -20,49 +21,54 @@ namespace LinkDev.IKEA.PL.Controllers
             _environment = environment;
             _logger = logger;
         }
-        public IActionResult Index(string searchTerm)
+        public async Task<IActionResult> Index(string searchTerm)
         {
             var userQuery = _userManager.Users.AsQueryable();
             if (!string.IsNullOrEmpty(searchTerm))
             {
                 userQuery = userQuery.Where(u => u.Email!.ToLower().Contains(searchTerm.ToLower()));
             }
+            
             var users = userQuery.Select(u => new UserViewModel()
             {
                 Id = u.Id,
                 FirstName = u.FirstName,
                 LastName = u.LastName,
-                Email = u.Email ?? string.Empty
+                Email = u.Email ?? string.Empty,
+                Roles = new List<string>()
             }).ToList();
+            
+            // Populate roles for each user
             foreach (var user in users)
             {
-                var foundUser = _userManager.FindByIdAsync(user.Id).Result;
+                var foundUser = await _userManager.FindByIdAsync(user.Id);
                 if (foundUser is not null)
                 {
-                    var roles = _userManager.GetRolesAsync(foundUser).Result;
-                    user.Roles = roles;
+                    var roles = await _userManager.GetRolesAsync(foundUser);
+                    user.Roles = roles.ToList();
                 }
             }
+            
             return View(users);
         }
 
         #region Details
         [HttpGet]
-        public IActionResult Details(string? id)
+        public async Task<IActionResult> Details(string? id)
         {
             if (id is null)
                 return BadRequest();
-            var user = _userManager.FindByIdAsync(id).Result;
+            var user = await _userManager.FindByIdAsync(id);
             if (user is null)
                 return NotFound();
-            var roles = _userManager.GetRolesAsync(user).Result;
+            var roles = await _userManager.GetRolesAsync(user);
             var model = new UserViewModel
             {
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email ?? string.Empty,
-                //Roles = roles
+                Roles = roles.ToList()
             };
             return View(model);
         }
@@ -70,26 +76,26 @@ namespace LinkDev.IKEA.PL.Controllers
 
         #region Edit
         [HttpGet]
-        public IActionResult Edit(string id)
+        public async Task<IActionResult> Edit(string id)
         {
             if (id is null)
                 return BadRequest();
-            var user = _userManager.FindByIdAsync(id).Result;
+            var user = await _userManager.FindByIdAsync(id);
             if (user is null)
                 return NotFound();
-            var roles = _userManager.GetRolesAsync(user).Result;
+            var roles = await _userManager.GetRolesAsync(user);
             var model = new UserEditViewModel
             {
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email ?? string.Empty,
-                //Roles = roles.ToList()
+                Roles = roles.ToList()
             };
             TempData["UserId"] = id;
             return View(model);
         }
         [HttpPost]
-        public IActionResult Edit(string id, UserEditViewModel model)
+        public async Task<IActionResult> Edit(string id, UserEditViewModel model)
         {
             if (id is null)
                 return BadRequest();
@@ -107,7 +113,7 @@ namespace LinkDev.IKEA.PL.Controllers
 
             try
             {
-                var user = _userManager.FindByIdAsync(id).Result;
+                var user = await _userManager.FindByIdAsync(id);
                 if (user is null)
                     return NotFound();
 
@@ -115,9 +121,7 @@ namespace LinkDev.IKEA.PL.Controllers
                 user.LastName = model.LastName;
                 user.Email = model.Email;
 
-                var result = _userManager.UpdateAsync(user).Result;
-
-
+                var result = await _userManager.UpdateAsync(user);
             }
             catch (Exception ex)
             {
@@ -128,18 +132,19 @@ namespace LinkDev.IKEA.PL.Controllers
             return RedirectToAction(nameof(Index));
         }
         #endregion
+
         [HttpPost]
-        public IActionResult Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (id is null)
                 return BadRequest();
             string message = "User deleted successfully.";
             try
             {
-                var user = _userManager.FindByIdAsync(id).Result;
+                var user = await _userManager.FindByIdAsync(id);
                 if (user is null)
                     return NotFound();
-                var result = _userManager.DeleteAsync(user).Result;
+                var result = await _userManager.DeleteAsync(user);
             }
             catch (Exception ex)
             {
