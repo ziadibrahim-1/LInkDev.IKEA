@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
 using LinkDev.IKEA.BLL.Models.Employees;
-using LinkDev.IKEA.BLL.Services.Departments;
 using LinkDev.IKEA.BLL.Services.Employees;
 using LinkDev.IKEA.DAL.Persistence.Common;
 using LinkDev.IKEA.PL.Models.Employee;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace LinkDev.IKEA.PL.Controllers
 {

@@ -2,7 +2,6 @@
 using LinkDev.IKEA.BLL.Models.Departments;
 using LinkDev.IKEA.BLL.Models.Employees;
 using LinkDev.IKEA.DAL.Contracts;
-using LinkDev.IKEA.DAL.Entities.Departments;
 using LinkDev.IKEA.DAL.Entities.Employees;
 using LinkDev.IKEA.DAL.Persistence.Common;
 using Microsoft.EntityFrameworkCore;

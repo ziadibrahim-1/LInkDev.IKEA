@@ -2,7 +2,6 @@
 using LinkDev.IKEA.BLL.Services.Departments;
 using LinkDev.IKEA.BLL.Services.Employees;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 namespace LinkDev.IKEA.BLL
 {
     public static class DependancyInjection

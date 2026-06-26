@@ -1,11 +1,12 @@
 ﻿using LinkDev.IKEA.DAL.Entities.Identity;
 using LinkDev.IKEA.PL.Models.Roles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace LinkDev.IKEA.PL.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class RoleController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;

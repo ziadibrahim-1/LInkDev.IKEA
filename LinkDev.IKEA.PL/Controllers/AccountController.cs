@@ -3,7 +3,6 @@ using LinkDev.IKEA.DAL.Entities.Identity;
 using LinkDev.IKEA.PL.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace LinkDev.IKEA.PL.Controllers
 {

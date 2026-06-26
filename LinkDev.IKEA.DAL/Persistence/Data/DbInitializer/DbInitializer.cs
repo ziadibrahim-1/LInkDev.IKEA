@@ -2,6 +2,8 @@
 using LinkDev.IKEA.DAL.Contracts;
 using LinkDev.IKEA.DAL.Entities.Departments;
 using LinkDev.IKEA.DAL.Entities.Employees;
+using LinkDev.IKEA.DAL.Entities.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
@@ -11,9 +13,16 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.DbInitializer
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public DbInitializer(ApplicationDbContext dbContext)
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        public DbInitializer(ApplicationDbContext dbContext,
+                UserManager<ApplicationUser> userManager,
+                RoleManager<IdentityRole> roleManager)
         {
             _dbContext = dbContext;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
         public void Initialize()
         {
@@ -22,7 +31,7 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.DbInitializer
             
         }
 
-        public void Seed()
+        public async Task Seed()
         {
             var serializeOptions = new JsonSerializerOptions
             {
@@ -41,8 +50,8 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.DbInitializer
                 var Departments = JsonSerializer.Deserialize<List<Department>>(DeparmentOption);
                 if (Departments != null && Departments.Count > 0)
                 {
-                    _dbContext.Departments.AddRange(Departments);
-                    _dbContext.SaveChanges();
+                    await _dbContext.Departments.AddRangeAsync(Departments);
+                    await _dbContext.SaveChangesAsync();
                 }
             }
 
@@ -53,8 +62,42 @@ namespace LinkDev.IKEA.DAL.Persistence.Data.DbInitializer
                 var Employees = JsonSerializer.Deserialize<List<Employee>>(EmployeeOptions, serializeOptions);
                 if (Employees != null && Employees.Count > 0)
                 {
-                    _dbContext.Employees.AddRange(Employees);
-                    _dbContext.SaveChanges();
+                    await _dbContext.Employees.AddRangeAsync(Employees);
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+           await SeedIdentityAsync();
+        }
+
+        private async Task SeedIdentityAsync()
+        {
+            // Create Role
+            if (!await _roleManager.RoleExistsAsync("Admin"))
+            {
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+
+            // Create Admin User
+            var email = "admin@gmail.com";
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    EmailConfirmed = true,
+                    FirstName = "Admin",
+                    LastName = "Admin"
+                };
+
+                var result = await _userManager.CreateAsync(user, "P@ssw0rd");
+
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, "Admin");
                 }
             }
         }
