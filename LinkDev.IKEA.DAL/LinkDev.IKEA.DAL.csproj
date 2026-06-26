@@ -7,16 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Persistence\Data\Configurations\" />
     <Folder Include="Persistence\Data\Migrations\" />
-    <Folder Include="Persistence\Data\DbInitializer\" />
-    <Folder Include="Persistence\Data\Seads\" />
-    <Folder Include="Persistence\UnitOfWork\" />
-    <Folder Include="Persistence\Repositories\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.15" />
   </ItemGroup>
 

@@ -1,0 +1,99 @@
+﻿@using LinkDev.IKEA.PL.Models.User
+@model UserEditViewModel
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4 py-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9 col-xl-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-warning text-dark p-4 border-0">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-dark bg-opacity-10 d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 56px; height: 56px;">
+                                <i class="fas fa-pen-to-square fs-4"></i>
+                            </div>
+                            <div>
+                                <h1 class="h3 mb-1">Edit User</h1>
+                                <p class="mb-0 text-dark-emphasis">Update profile information and review assigned roles</p>
+                            </div>
+                        </div>
+
+                        <a asp-action="Index" class="btn btn-outline-dark btn-sm px-3">
+                            <i class="fas fa-arrow-left me-1"></i> Back to List
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-lg-5">
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0"></div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label asp-for="FirstName" class="form-label fw-semibold"></label>
+                                <input asp-for="FirstName" class="form-control form-control-lg" />
+                                <span asp-validation-for="FirstName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="LastName" class="form-label fw-semibold"></label>
+                                <input asp-for="LastName" class="form-control form-control-lg" />
+                                <span asp-validation-for="LastName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Email" class="form-label fw-semibold"></label>
+                                <input asp-for="Email" class="form-control form-control-lg" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <label class="form-label fw-semibold mb-0">Roles</label>
+                                    <span class="badge bg-secondary rounded-pill">@Model.Roles.Count</span>
+                                </div>
+
+                                @if (Model.Roles.Any())
+                                {
+                                    <div class="d-flex flex-wrap gap-2 p-3 bg-light rounded-4 border">
+                                        @foreach (var role in Model.Roles)
+                                        {
+                                            <span class="badge rounded-pill text-bg-primary px-3 py-2">@role</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-info border-0 mb-0 d-flex align-items-center gap-2">
+                                        <i class="fas fa-circle-info"></i>
+                                        <span>No roles assigned.</span>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end gap-2 pt-2">
+                                    <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-warning px-4 fw-semibold">
+                                        <i class="fas fa-floppy-disk me-1"></i> Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+

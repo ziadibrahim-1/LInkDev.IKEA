@@ -1,0 +1,393 @@
+﻿@model EmployeeListViewModel
+@{
+    ViewData["Title"] = "Employees";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="mb-0 fw-bold">Employees</h2>
+            <small class="text-muted">Manage employees, browse details and perform actions.</small>
+        </div>
+
+        <div class="d-flex align-items-center w-100">
+            <div class="d-flex gap-2 align-items-center flex-grow-1">
+                <form asp-action="Index" method="get" class="d-flex align-items-center">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" asp-for="SearchTerm" class="form-control border-start-0" placeholder="Search employees...">
+                        <button class="btn btn-outline-secondary" type="submit">Search</button>
+                        <button type="button" class="btn btn-outline-light" id="clearSearch" title="Clear search"><i class="fas fa-times text-muted"></i></button>
+                    </div>
+
+                   
+                </form>
+
+                <div class="btn-group ms-2" role="group">
+                    <button type="button" class="btn btn-outline-secondary" id="toggleTable" aria-pressed="true" title="Table view"><i class="fas fa-table"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" id="toggleGrid" title="Grid view"><i class="fas fa-th-large"></i></button>
+                </div>
+            </div>
+
+            <a asp-action="Create" class="btn btn-primary btn-lg ms-auto shadow-sm">
+                <i class="fas fa-plus me-1"></i> Create New Employee
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm rounded-4 overflow-hidden">
+        @{
+            bool IsSortedBy(string field) => string.Equals(Model.SortedBy, field, StringComparison.OrdinalIgnoreCase);
+            string SortIcon(string field) => IsSortedBy(field)
+                ? (Model.SortAscynding ? "fa-arrow-up" : "fa-arrow-down")
+                : "fa-sort";
+            bool NextSortAsc(string field) => IsSortedBy(field) ? !Model.SortAscynding : true;
+        }
+        <div class="card-body p-0">
+            <div id="employeeTableView" class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-muted small">
+                        <tr>
+                            <th class="ps-4">
+                                <a asp-action="Index"
+                                   asp-route-pageIndex="@Model.Page"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-searchTerm="@Model.SearchTerm"
+                                   asp-route-sortedBy="FullName"
+                                   asp-route-sortAscynding="@NextSortAsc("FullName")"
+                                   class="text-decoration-none text-muted">
+                                    Employee
+                                    <i class="fas @SortIcon("FullName") ms-1"></i>
+                                </a>
+                            </th>
+                            <th>
+                                <a asp-action="Index"
+                                   asp-route-pageIndex="@Model.Page"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-searchTerm="@Model.SearchTerm"
+                                   asp-route-sortedBy="Email"
+                                   asp-route-sortAscynding="@NextSortAsc("Email")"
+                                   class="text-decoration-none text-muted">
+                                    Email
+                                    <i class="fas @SortIcon("Email") ms-1"></i>
+                                </a>
+                            </th>
+                            <th>
+                                <a asp-action="Index"
+                                   asp-route-pageIndex="@Model.Page"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-searchTerm="@Model.SearchTerm"
+                                   asp-route-sortedBy="Department"
+                                   asp-route-sortAscynding="@NextSortAsc("Department")"
+                                   class="text-decoration-none text-muted">
+                                    Department
+                                    <i class="fas @SortIcon("Department") ms-1"></i>
+                                </a>
+                            </th>
+                            <th class="text-center">
+                                <a asp-action="Index"
+                                   asp-route-pageIndex="@Model.Page"
+                                   asp-route-pageSize="@Model.PageSize"
+                                   asp-route-searchTerm="@Model.SearchTerm"
+                                   asp-route-sortedBy="Status"
+                                   asp-route-sortAscynding="@NextSortAsc("Status")"
+                                   class="text-decoration-none text-muted">
+                                    Status
+                                    <i class="fas @SortIcon("Status") ms-1"></i>
+                                </a>
+                            </th>
+                            <th>
+                                De/Activate
+                            </th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Employees)
+                        {
+                            var initials = "";
+                            if (!string.IsNullOrWhiteSpace(item.FullName))
+                            {
+                                var parts = item.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                if (parts.Length == 1) initials = parts[0].Substring(0, 1).ToUpper();
+                                else initials = (parts[0].Substring(0, 1) + parts[^1].Substring(0, 1)).ToUpper();
+                            }
+
+                            <tr>
+                                <td class="d-flex align-items-center gap-3 ps-4">
+                                    <div class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center" style="width:44px;height:44px;font-weight:600;">
+                                        @initials
+                                    </div>
+                                    <div>
+                                        <div class="fw-semibold">@item.FullName</div>
+                                        <div class="small text-muted">@item.PhoneNumber</div>
+                                    </div>
+                                </td>
+                                <td>@item.Email</td>
+                                <td>@item.Department</td>
+                                <td class="text-center">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge rounded-pill bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge rounded-pill bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td>
+                                    <form asp-action="ToggleStatus" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <input type="hidden" name="isActive" value="@((!item.IsActive).ToString().ToLower())" />
+                                        <button type="submit" class="btn btn-lg @(item.IsActive ? "btn-outline-secondary" : "btn-outline-success")" title="@(item.IsActive ? "Deactivate" : "Activate")">
+                                            <i class="fas @(item.IsActive ? "fa-toggle-on" : "fa-toggle-off")"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger js-delete-employee"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteEmployeeModal"
+                                                data-employee-id="@item.Id"
+                                                data-employee-name="@item.FullName"
+                                                data-employee-email="@item.Email">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="employeeGridView" class="p-3 d-none">
+                <div class="row g-3">
+                    @foreach (var item in Model.Employees)
+                    {
+                        var initials = "";
+                        if (!string.IsNullOrWhiteSpace(item.FullName))
+                        {
+                            var parts = item.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                            if (parts.Length == 1) initials = parts[0].Substring(0, 1).ToUpper();
+                            else initials = (parts[0].Substring(0, 1) + parts[^1].Substring(0, 1)).ToUpper();
+                        }
+
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width:48px;height:48px;font-weight:600;">
+                                            @initials
+                                        </div>
+                                        <div class="flex-fill">
+                                            <div class="fw-semibold">@item.FullName</div>
+                                            <div class="small text-muted">@item.Department</div>
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id"><i class="fas fa-eye me-2"></i>Details</a></li>
+                                                <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id"><i class="fas fa-pen me-2"></i>Edit</a></li>
+                                                <li><hr class="dropdown-divider" /></li>
+                                                <li>
+                                                    <button type="button"
+                                                            class="dropdown-item text-danger js-delete-employee"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteEmployeeModal"
+                                                            data-employee-id="@item.Id"
+                                                            data-employee-name="@item.FullName"
+                                                            data-employee-email="@item.Email">
+                                                        <i class="fas fa-trash me-2"></i>Delete
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-auto small text-muted">
+                                        <div>📧 @item.Email</div>
+                                        <div>💼 @item.EmployeeType</div>
+                                        <div>📅 @item.FormattedHireDate</div>
+                                        <div>💰 @string.Format("{0:C}", item.Salary)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination & Summary -->
+    @{
+        var prevDisabled = Model.Page == 1 ? "disabled" : "";
+        var nextDisabled = Model.Page * Model.PageSize >= Model.TotalCount ? "disabled" : "";
+        var totalPages = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
+    }
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="text-muted small">
+            Showing @(((Model.Page - 1) * Model.PageSize) + 1) to @Math.Min(Model.Page * Model.PageSize, Model.TotalCount) of @Model.TotalCount employees
+        </div>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @prevDisabled">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-pageIndex="@(Model.Page - 1)"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-searchTerm="@Model.SearchTerm"
+                       asp-route-sortedBy="@Model.SortedBy"
+                       asp-route-sortAscynding="@Model.SortAscynding">
+                        Previous
+                    </a>
+                </li>
+
+                @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(totalPages, Model.Page + 2); i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-pageIndex="@i"
+                           asp-route-pageSize="@Model.PageSize"
+                           asp-route-searchTerm="@Model.SearchTerm"
+                           asp-route-sortedBy="@Model.SortedBy"
+                           asp-route-sortAscynding="@Model.SortAscynding">
+                            @i
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item @nextDisabled">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-pageIndex="@(Model.Page + 1)"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-searchTerm="@Model.SearchTerm"
+                       asp-route-sortedBy="@Model.SortedBy"
+                       asp-route-sortAscynding="@Model.SortAscynding">
+                        Next
+                   </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+</div>
+
+<div class="modal fade" id="deleteEmployeeModal" tabindex="-1" aria-labelledby="deleteEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-danger text-white border-0 rounded-top-4">
+                <h5 class="modal-title" id="deleteEmployeeModalLabel">
+                    <i class="fas fa-triangle-exclamation me-2"></i> Delete Employee
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">Are you sure you want to delete this employee?</p>
+                <div class="alert alert-warning mb-0">
+                    <div class="fw-semibold" id="deleteEmployeeName"></div>
+                    <div class="text-muted small" id="deleteEmployeeEmail"></div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-action="Delete" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="deleteEmployeeId" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(TempData["Message"] as string))
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">IKEA</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @TempData["Message"]
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            var btnClear = document.getElementById('clearSearch');
+            if (btnClear) btnClear.addEventListener('click', function (e) {
+                e.preventDefault();
+                var input = document.querySelector('input[name="searchTerm"]');
+                if (input) input.value = '';
+                var form = this.closest('form');
+                if (form) form.submit();
+            });
+
+            var toggleTable = document.getElementById('toggleTable');
+            var toggleGrid = document.getElementById('toggleGrid');
+            var tableView = document.getElementById('employeeTableView');
+            var gridView = document.getElementById('employeeGridView');
+
+            function setView(view) {
+                if (view === 'grid') {
+                    gridView.classList.remove('d-none');
+                    tableView.classList.add('d-none');
+                    toggleGrid.classList.add('active');
+                    toggleTable.classList.remove('active');
+                } else {
+                    gridView.classList.add('d-none');
+                    tableView.classList.remove('d-none');
+                    toggleTable.classList.add('active');
+                    toggleGrid.classList.remove('active');
+                }
+            }
+
+            if (toggleTable) toggleTable.addEventListener('click', function () { setView('table'); });
+            if (toggleGrid) toggleGrid.addEventListener('click', function () { setView('grid'); });
+
+            // sort controls
+
+            var deleteEmployeeId = document.getElementById('deleteEmployeeId');
+            var deleteEmployeeName = document.getElementById('deleteEmployeeName');
+            var deleteEmployeeEmail = document.getElementById('deleteEmployeeEmail');
+            var deleteEmployeeModal = document.getElementById('deleteEmployeeModal');
+
+            document.querySelectorAll('.js-delete-employee').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    if (deleteEmployeeId) deleteEmployeeId.value = this.dataset.employeeId || '';
+                    if (deleteEmployeeName) deleteEmployeeName.textContent = this.dataset.employeeName || '';
+                    if (deleteEmployeeEmail) deleteEmployeeEmail.textContent = this.dataset.employeeEmail || '';
+                });
+            });
+
+            if (deleteEmployeeModal) {
+                deleteEmployeeModal.addEventListener('hidden.bs.modal', function () {
+                    if (deleteEmployeeId) deleteEmployeeId.value = '';
+                    if (deleteEmployeeName) deleteEmployeeName.textContent = '';
+                    if (deleteEmployeeEmail) deleteEmployeeEmail.textContent = '';
+                });
+            }
+        })();
+    </script>
+}
+
