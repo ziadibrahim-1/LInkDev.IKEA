@@ -1,24 +1,34 @@
+using LinkDev.IKEA.BLL;
 using LinkDev.IKEA.DAL;
+using LinkDev.IKEA.DAL.Contracts;
+using LinkDev.IKEA.PL.Extentions;
+using System.Threading.Tasks;
 
 namespace LinkDev.IKEA.PL
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             #region Services
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddWebServvices();
 
             //builder.Services.AddPersistenceServices(builder.Configuration);
             //builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddPersistenceServices(builder.Configuration);
+            builder.Services.AddApplicationServices();
 
             #endregion
 
             var app = builder.Build();
+
+
+            #region Database Initializer
+            await app.InitializeDatabase(); 
+            #endregion
 
             #region Http Requsts Pipelines
             // Configure the HTTP request pipeline.

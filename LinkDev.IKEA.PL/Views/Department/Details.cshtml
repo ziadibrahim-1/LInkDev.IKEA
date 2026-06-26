@@ -1,0 +1,103 @@
+﻿@model DepartmentDetailsViewMOdel
+@{
+    ViewData["Title"] = "Department Details";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+                <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10 pe-none" style="background: radial-gradient(circle at top left, #0d6efd 0, transparent 35%), radial-gradient(circle at bottom right, #198754 0, transparent 30%);"></div>
+
+                <div class="card-header bg-primary bg-gradient text-white py-4 position-relative" style="z-index: 1;">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="badge text-bg-light text-primary px-3 py-2">Department</span>
+                                <span class="badge text-bg-warning text-dark px-3 py-2">Read Only</span>
+                            </div>
+                            <h1 class="h3 mb-1 fw-bold">Department Details</h1>
+                            <p class="mb-0 text-white-50">A polished summary of the department record.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5 position-relative" style="z-index: 1;">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="p-4 border rounded-4 bg-body-tertiary h-100 shadow-sm">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                        <i class="fas fa-barcode fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small text-uppercase fw-semibold">Code</div>
+                                        <div class="fs-5 fw-bold">@Model.Code</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-4 border rounded-4 bg-body-tertiary h-100 shadow-sm">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                        <i class="fas fa-building fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted small text-uppercase fw-semibold">Name</div>
+                                        <div class="fs-5 fw-bold text-break">@Model.Name</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="p-4 rounded-4 bg-light border">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <i class="fas fa-circle-info text-primary"></i>
+                                    <h2 class="h5 mb-0">Information</h2>
+                                </div>
+
+                                <dl class="row g-3 mb-0">
+                                    <dt class="col-sm-4 col-lg-3 text-muted">@Html.DisplayNameFor(m => m.Description)</dt>
+                                    <dd class="col-sm-8 col-lg-9">@Html.DisplayFor(m => m.Description)</dd>
+
+                                    <dt class="col-sm-4 col-lg-3 text-muted">@Html.DisplayNameFor(m => m.CreationDate)</dt>
+                                    <dd class="col-sm-8 col-lg-9">@Html.DisplayFor(m => m.CreationDate)</dd>
+
+                                    <dt class="col-sm-4 col-lg-3 text-muted">@Html.DisplayNameFor(m => m.CreatedBy)</dt>
+                                    <dd class="col-sm-8 col-lg-9">@Html.DisplayFor(m => m.CreatedBy)</dd>
+
+                                    <dt class="col-sm-4 col-lg-3 text-muted">@Html.DisplayNameFor(m => m.CreatedOn)</dt>
+                                    <dd class="col-sm-8 col-lg-9">@Html.DisplayFor(m => m.CreatedOn)</dd>
+
+                                    <dt class="col-sm-4 col-lg-3 text-muted">@Html.DisplayNameFor(m => m.LastModifiedBy)</dt>
+                                    <dd class="col-sm-8 col-lg-9">@Html.DisplayFor(m => m.LastModifiedBy)</dd>
+
+                                    <dt class="col-sm-4 col-lg-3 text-muted">@Html.DisplayNameFor(m => m.LastModifiedOn)</dt>
+                                    <dd class="col-sm-8 col-lg-9">@Html.DisplayFor(m => m.LastModifiedOn)</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-top-0 p-4 position-relative" style="z-index: 1;">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div class="text-muted small">
+                            <i class="fas fa-lock me-1"></i> Editing is disabled in this view.
+                        </div>
+                        <a asp-controller="Department" asp-action="Index" class="btn btn-outline-secondary px-4">
+                            <i class="fas fa-arrow-left me-1"></i> Back to List
+                        </a>
+                        <a asp-controller="Department" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-success px-4">
+                            <i class="fas fa-pen-to-square me-1"></i> Edit
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

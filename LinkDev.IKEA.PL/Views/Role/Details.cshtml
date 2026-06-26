@@ -1,0 +1,76 @@
+﻿@model RoleViewModel
+@{
+    ViewData["Title"] = "Role Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4 py-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-info text-white p-4 border-0">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle bg-white bg-opacity-25 d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 56px; height: 56px;">
+                                <i class="fas fa-lock text-white fs-4"></i>
+                            </div>
+                            <div>
+                                <h1 class="h3 mb-1">Role Details</h1>
+                                <p class="mb-0 text-white-50">Role information and configuration</p>
+                            </div>
+                        </div>
+
+                        <a asp-action="Index" class="btn btn-light btn-sm px-3">
+                            <i class="fas fa-arrow-left me-1"></i> Back to List
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-lg-5">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="p-3 rounded-4 bg-light border">
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-md-6">
+                                        <div class="text-muted small text-uppercase fw-semibold mb-1">Role Name</div>
+                                        <div class="fs-4 fw-bold">@Model.Name</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="text-muted small text-uppercase fw-semibold mb-1">Role ID</div>
+                                        <div class="text-break text-muted small">
+                                            <code>@Model.Id</code>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="alert alert-info border-0 d-flex align-items-start gap-3 mb-0">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-circle-info fs-5"></i>
+                                </div>
+                                <div>
+                                    <h5 class="alert-heading mb-1">Role Information</h5>
+                                    <p class="mb-0 small">This role has been created and configured in the system. You can edit this role to manage its permissions and assignments.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="d-flex justify-content-end gap-2 pt-2">
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i> Close
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">
+                                    <i class="fas fa-pen-to-square me-1"></i> Edit
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
