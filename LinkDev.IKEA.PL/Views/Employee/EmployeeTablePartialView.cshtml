@@ -1,0 +1,135 @@
+﻿@model EmployeeListViewModel
+
+@{
+    bool IsSortedBy(string field) => string.Equals(Model.SortedBy, field, StringComparison.OrdinalIgnoreCase);
+    string SortIcon(string field) => IsSortedBy(field)
+        ? (Model.SortAscynding ? "fa-arrow-up" : "fa-arrow-down")
+        : "fa-sort";
+    bool NextSortAsc(string field) => IsSortedBy(field) ? !Model.SortAscynding : true;
+}
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light text-muted small">
+            <tr>
+                <th class="ps-4">
+                    <a asp-action="Index"
+                       asp-route-pageIndex="@Model.Page"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-searchTerm="@Model.SearchTerm"
+                       asp-route-sortedBy="FullName"
+                       asp-route-sortAscynding="@NextSortAsc("FullName")"
+                       class="text-decoration-none text-muted">
+                        Employee
+                        <i class="fas @SortIcon("FullName") ms-1"></i>
+                    </a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-route-pageIndex="@Model.Page"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-searchTerm="@Model.SearchTerm"
+                       asp-route-sortedBy="Email"
+                       asp-route-sortAscynding="@NextSortAsc("Email")"
+                       class="text-decoration-none text-muted">
+                        Email
+                        <i class="fas @SortIcon("Email") ms-1"></i>
+                    </a>
+                </th>
+                <th>
+                    <a asp-action="Index"
+                       asp-route-pageIndex="@Model.Page"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-searchTerm="@Model.SearchTerm"
+                       asp-route-sortedBy="Department"
+                       asp-route-sortAscynding="@NextSortAsc("Department")"
+                       class="text-decoration-none text-muted">
+                        Department
+                        <i class="fas @SortIcon("Department") ms-1"></i>
+                    </a>
+                </th>
+                <th class="text-center">
+                    <a asp-action="Index"
+                       asp-route-pageIndex="@Model.Page"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-searchTerm="@Model.SearchTerm"
+                       asp-route-sortedBy="Status"
+                       asp-route-sortAscynding="@NextSortAsc("Status")"
+                       class="text-decoration-none text-muted">
+                        Status
+                        <i class="fas @SortIcon("Status") ms-1"></i>
+                    </a>
+                </th>
+                <th>
+                    De/Activate
+                </th>
+                <th class="text-end pe-4">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Employees)
+            {
+                var initials = "";
+                if (!string.IsNullOrWhiteSpace(item.FullName))
+                {
+                    var parts = item.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 1) initials = parts[0].Substring(0, 1).ToUpper();
+                    else initials = (parts[0].Substring(0, 1) + parts[^1].Substring(0, 1)).ToUpper();
+                }
+
+                <tr>
+                    <td class="d-flex align-items-center gap-3 ps-4">
+                        <div class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center" style="width:44px;height:44px;font-weight:600;">
+                            @initials
+                        </div>
+                        <div>
+                            <div class="fw-semibold">@item.FullName</div>
+                            <div class="small text-muted">@item.PhoneNumber</div>
+                        </div>
+                    </td>
+                    <td>@item.Email</td>
+                    <td>@item.Department</td>
+                    <td class="text-center">
+                        @if (item.IsActive)
+                        {
+                            <span class="badge rounded-pill bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge rounded-pill bg-secondary">Inactive</span>
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="ToggleStatus" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <input type="hidden" name="isActive" value="@((!item.IsActive).ToString().ToLower())" />
+                            <button type="submit" class="btn btn-lg @(item.IsActive ? "btn-outline-secondary" : "btn-outline-success")" title="@(item.IsActive ? "Deactivate" : "Activate")">
+                                <i class="fas @(item.IsActive ? "fa-toggle-on" : "fa-toggle-off")"></i>
+                            </button>
+                        </form>
+                    </td>
+                    <td class="text-end pe-4">
+                        <div class="btn-group">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger js-delete-employee"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteEmployeeModal"
+                                    data-employee-id="@item.Id"
+                                    data-employee-name="@item.FullName"
+                                    data-employee-email="@item.Email">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

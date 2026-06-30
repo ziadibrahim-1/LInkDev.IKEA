@@ -73,6 +73,35 @@ namespace LinkDev.IKEA.PL.Controllers
             return View(model);
         }
 
+        public IActionResult Search(string searchTerm = "", string SortedBy = "name", bool SortAscynding = true, int pageIndex = 1, int pageSize = 10)
+        {
+            var queryParamters = new QueryParamters
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                SearchTerm = searchTerm,
+                SortedBy = SortedBy,
+                SortAscynding = SortAscynding
+
+            };
+            var employees = _EmployeeService.GetEmployees(queryParamters);
+            var employeeViewModel = _mapper.Map<IEnumerable<EmployeeViewModel>>(employees.date);
+
+            var model = new EmployeeListViewModel()
+            {
+                Employees = employeeViewModel,
+                Page = pageIndex,
+                PageSize = pageSize,
+                TotalCount = employees.TotalCount,
+                SearchTerm = searchTerm,
+                SortAscynding = SortAscynding,
+                SortedBy = SortedBy
+            };
+
+            return PartialView("EmployeeTablePartialView", model);
+        }
+
+
         public IActionResult Details(int? id)
         {
             if (!id.HasValue)

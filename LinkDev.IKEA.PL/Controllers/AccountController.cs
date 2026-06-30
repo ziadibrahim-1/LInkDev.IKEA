@@ -1,8 +1,16 @@
 ﻿using LinkDev.IKEA.BLL.Services.EmailService;
 using LinkDev.IKEA.DAL.Entities.Identity;
+using LinkDev.IKEA.PL.Helper;
 using LinkDev.IKEA.PL.Models.Identity;
+using LinkDev.IKEA.PL.Models.SMS;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Security.Claims;
 
 namespace LinkDev.IKEA.PL.Controllers
 {
@@ -10,15 +18,22 @@ namespace LinkDev.IKEA.PL.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IEmailSender _emailSender;
+        private readonly IMailService _mailService;
+        private readonly ISMSService _sMSService;
+
+        //private readonly IEmailSender _emailSender;
 
         public AccountController(UserManager<ApplicationUser> userManager,
                                 SignInManager<ApplicationUser> signInManager,
+                                IMailService mailService,
+                                ISMSService sMSService,
                                 IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _emailSender = emailSender;
+            _mailService = mailService;
+            _sMSService = sMSService;
+            //_emailSender = emailSender;
         }
         #region Sign_Up
         [HttpGet]
@@ -100,8 +115,58 @@ namespace LinkDev.IKEA.PL.Controllers
 
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             return View(model);
+        }
+
+        public IActionResult GoogleLogIn()
+        {
+            var URI = Url.Action("GoogleResponse", "Account");
+            var prop = _signInManager.ConfigureExternalAuthenticationProperties(
+                GoogleDefaults.AuthenticationScheme, URI
+            );
+            return Challenge(prop, GoogleDefaults.AuthenticationScheme);
+
+        }
 
 
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if(info == null)
+                return RedirectToAction(nameof(SignIn));
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider,
+                info.ProviderKey,
+                isPersistent: false
+            );
+            if(signInResult.Succeeded)
+                return RedirectToAction("Index", "Home");
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if(email == null)
+                return RedirectToAction(nameof(SignIn));
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if(user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FirstName = info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? "NA",
+                    LastName = info.Principal.FindFirstValue(ClaimTypes.Surname) ?? "NA",
+                    IsAgree = true,
+                    EmailConfirmed = true
+                };
+
+                var CreateResult =  await _userManager.CreateAsync(user);
+                if(!CreateResult.Succeeded)
+                {
+                    ModelState.AddModelError(string.Empty, "Error creating user account.");
+                    return RedirectToAction(nameof(SignIn));
+                }
+            }
+            await _userManager.AddLoginAsync(user, info);
+            await _signInManager.SignInAsync(user, isPersistent: false);
+            return RedirectToAction("Index", "Home");
         }
         #endregion
 
@@ -137,7 +202,8 @@ namespace LinkDev.IKEA.PL.Controllers
                         Subject = "Reset Password",
                         Body = $"Please reset your password by clicking <a href='{url}'>here</a>."
                     };
-                    _emailSender.SendEmail(email);
+                    //_emailSender.SendEmail(email);
+                    _mailService.Send(email);
                     return RedirectToAction(nameof(CheckYourInbox));
                 }
             }
@@ -146,6 +212,32 @@ namespace LinkDev.IKEA.PL.Controllers
                 ModelState.AddModelError(string.Empty, "Invalid operation please try again.");
             }
             return View(forgetPasswordViewModel);
+        }
+        [HttpPost]
+        public async Task<IActionResult> SendRestPasswordUrlSMS(ForgetPasswordViewModel forgetPasswordViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(forgetPasswordViewModel.Email);
+                if (user != null)
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var url = Url.Action("ChangePassword", "Account", new { email = forgetPasswordViewModel.Email, token }, Request.Scheme) ?? string.Empty;
+
+                    var sms = new SMSMessage()
+                    {
+                        PhoneNumber = user.PhoneNumber ?? string.Empty,
+                        Body = url 
+                    };
+                    _sMSService.SendSMS(sms);
+                    return Ok("Check Your SMS");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid operation please try again.");
+            }
+            return View(nameof(ResetPassword),forgetPasswordViewModel);
         }
 
         [HttpGet]

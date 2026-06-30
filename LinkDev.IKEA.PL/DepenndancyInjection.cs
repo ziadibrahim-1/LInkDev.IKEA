@@ -1,7 +1,9 @@
 ﻿using LinkDev.IKEA.BLL.Services.EmailService;
 using LinkDev.IKEA.DAL.Entities.Identity;
 using LinkDev.IKEA.DAL.Persistence.Data;
+using LinkDev.IKEA.PL.Helper;
 using LinkDev.IKEA.PL.Mapping.Profiles;
+using LinkDev.IKEA.PL.Settings;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection;
 
@@ -16,6 +18,7 @@ namespace LinkDev.IKEA.PL
             services.AddAutoMapper(M => { },typeof(EmployeeProfile));
 
             services.AddScoped<IEmailSender, EmailService>();
+            
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -44,6 +47,14 @@ namespace LinkDev.IKEA.PL
                 options.ExpireTimeSpan = TimeSpan.FromDays(30);
                 options.SlidingExpiration = true;
             });
+            return services;
+        }
+        public static IServiceCollection AddMessageing(this IServiceCollection services , IConfiguration configuration)
+        {
+            services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
+            services.Configure<SMSSettings>(configuration.GetSection("Twilio"));
+            services.AddTransient<IMailService, MailService>();
+            services.AddTransient<ISMSService, SMSService>();
             return services;
         }
     }
