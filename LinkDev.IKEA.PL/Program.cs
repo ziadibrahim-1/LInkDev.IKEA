@@ -1,8 +1,10 @@
 using LinkDev.IKEA.BLL;
 using LinkDev.IKEA.DAL;
-using LinkDev.IKEA.DAL.Contracts;
 using LinkDev.IKEA.PL.Extentions;
-using System.Threading.Tasks;
+using LinkDev.IKEA.PL.Settings;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Identity;
 
 namespace LinkDev.IKEA.PL
 {
@@ -20,6 +22,15 @@ namespace LinkDev.IKEA.PL
             //builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddApplicationServices();
+            builder.Services.AddMessageing(builder.Configuration);
+
+            builder.Services.AddAuthentication(
+            ).AddGoogle(o =>
+            {
+                IConfiguration GoogleAuth = builder.Configuration.GetSection("Authentication:Google");
+                o.ClientId = GoogleAuth["ClientId"]!;
+                o.ClientSecret = GoogleAuth["ClientSecret"]!;
+            });
 
             #endregion
 
@@ -27,7 +38,7 @@ namespace LinkDev.IKEA.PL
 
 
             #region Database Initializer
-            await app.InitializeDatabase(); 
+            await app.InitializeDatabase();
             #endregion
 
             #region Http Requsts Pipelines
@@ -41,14 +52,15 @@ namespace LinkDev.IKEA.PL
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
+            
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
-                .WithStaticAssets(); 
+                .WithStaticAssets();
             #endregion
 
             app.Run();
