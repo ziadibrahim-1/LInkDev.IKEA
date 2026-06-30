@@ -4,14 +4,19 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>3cece5f1-a3ec-4775-b99c-496acc4b7660</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.17.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.15">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.12" />
+    <PackageReference Include="MimeKit" Version="4.17.0" />
+    <PackageReference Include="Twilio" Version="7.14.9" />
   </ItemGroup>
 
   <ItemGroup>

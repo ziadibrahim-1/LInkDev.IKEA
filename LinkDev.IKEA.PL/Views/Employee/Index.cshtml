@@ -12,15 +12,13 @@
 
         <div class="d-flex align-items-center w-100">
             <div class="d-flex gap-2 align-items-center flex-grow-1">
-                <form asp-action="Index" method="get" class="d-flex align-items-center">
+                <form id="searchForm" class="d-flex align-items-center">
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                        <input type="text" asp-for="SearchTerm" class="form-control border-start-0" placeholder="Search employees...">
+                        <input type="text" id="searchTermInput" name="searchTerm" value="@Model.SearchTerm" class="form-control border-start-0" placeholder="Search employees...">
                         <button class="btn btn-outline-secondary" type="submit">Search</button>
                         <button type="button" class="btn btn-outline-light" id="clearSearch" title="Clear search"><i class="fas fa-times text-muted"></i></button>
                     </div>
-
-                   
                 </form>
 
                 <div class="btn-group ms-2" role="group">
@@ -44,130 +42,8 @@
             bool NextSortAsc(string field) => IsSortedBy(field) ? !Model.SortAscynding : true;
         }
         <div class="card-body p-0">
-            <div id="employeeTableView" class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light text-muted small">
-                        <tr>
-                            <th class="ps-4">
-                                <a asp-action="Index"
-                                   asp-route-pageIndex="@Model.Page"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-searchTerm="@Model.SearchTerm"
-                                   asp-route-sortedBy="FullName"
-                                   asp-route-sortAscynding="@NextSortAsc("FullName")"
-                                   class="text-decoration-none text-muted">
-                                    Employee
-                                    <i class="fas @SortIcon("FullName") ms-1"></i>
-                                </a>
-                            </th>
-                            <th>
-                                <a asp-action="Index"
-                                   asp-route-pageIndex="@Model.Page"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-searchTerm="@Model.SearchTerm"
-                                   asp-route-sortedBy="Email"
-                                   asp-route-sortAscynding="@NextSortAsc("Email")"
-                                   class="text-decoration-none text-muted">
-                                    Email
-                                    <i class="fas @SortIcon("Email") ms-1"></i>
-                                </a>
-                            </th>
-                            <th>
-                                <a asp-action="Index"
-                                   asp-route-pageIndex="@Model.Page"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-searchTerm="@Model.SearchTerm"
-                                   asp-route-sortedBy="Department"
-                                   asp-route-sortAscynding="@NextSortAsc("Department")"
-                                   class="text-decoration-none text-muted">
-                                    Department
-                                    <i class="fas @SortIcon("Department") ms-1"></i>
-                                </a>
-                            </th>
-                            <th class="text-center">
-                                <a asp-action="Index"
-                                   asp-route-pageIndex="@Model.Page"
-                                   asp-route-pageSize="@Model.PageSize"
-                                   asp-route-searchTerm="@Model.SearchTerm"
-                                   asp-route-sortedBy="Status"
-                                   asp-route-sortAscynding="@NextSortAsc("Status")"
-                                   class="text-decoration-none text-muted">
-                                    Status
-                                    <i class="fas @SortIcon("Status") ms-1"></i>
-                                </a>
-                            </th>
-                            <th>
-                                De/Activate
-                            </th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Employees)
-                        {
-                            var initials = "";
-                            if (!string.IsNullOrWhiteSpace(item.FullName))
-                            {
-                                var parts = item.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                                if (parts.Length == 1) initials = parts[0].Substring(0, 1).ToUpper();
-                                else initials = (parts[0].Substring(0, 1) + parts[^1].Substring(0, 1)).ToUpper();
-                            }
-
-                            <tr>
-                                <td class="d-flex align-items-center gap-3 ps-4">
-                                    <div class="rounded-circle bg-secondary-subtle text-secondary d-inline-flex align-items-center justify-content-center" style="width:44px;height:44px;font-weight:600;">
-                                        @initials
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold">@item.FullName</div>
-                                        <div class="small text-muted">@item.PhoneNumber</div>
-                                    </div>
-                                </td>
-                                <td>@item.Email</td>
-                                <td>@item.Department</td>
-                                <td class="text-center">
-                                    @if (item.IsActive)
-                                    {
-                                        <span class="badge rounded-pill bg-success">Active</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge rounded-pill bg-secondary">Inactive</span>
-                                    }
-                                </td>
-                                <td>
-                                    <form asp-action="ToggleStatus" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <input type="hidden" name="isActive" value="@((!item.IsActive).ToString().ToLower())" />
-                                        <button type="submit" class="btn btn-lg @(item.IsActive ? "btn-outline-secondary" : "btn-outline-success")" title="@(item.IsActive ? "Deactivate" : "Activate")">
-                                            <i class="fas @(item.IsActive ? "fa-toggle-on" : "fa-toggle-off")"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                                <td class="text-end pe-4">
-                                    <div class="btn-group">
-                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">
-                                            <i class="fas fa-pen"></i>
-                                        </a>
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-danger js-delete-employee"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#deleteEmployeeModal"
-                                                data-employee-id="@item.Id"
-                                                data-employee-name="@item.FullName"
-                                                data-employee-email="@item.Email">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+            <div id="employeeTableContainer">
+                @await Html.PartialAsync("EmployeeTablePartialView", Model)
             </div>
 
             <div id="employeeGridView" class="p-3 d-none">
@@ -334,59 +210,101 @@
 @section Scripts {
     <script>
         (function () {
+            // Live search AJAX
+            var searchInput = document.getElementById('searchTermInput');
+            var searchForm = document.getElementById('searchForm');
+            var tableContainer = document.getElementById('employeeTableContainer');
+
+            if (searchInput && searchForm) {
+                searchInput.addEventListener('keyup', function (e) {
+                    e.preventDefault();
+                    var searchTerm = searchInput.value.trim();
+
+                    $.ajax({
+                        url: '@Url.Action("Search", "Employee")',
+                        type: 'GET',
+                        data: {
+                            searchTerm: searchTerm,
+                            sortedBy: '@Model.SortedBy',
+                            sortAscynding: '@Model.SortAscynding',
+                            pageIndex: 1,
+                            pageSize: '@Model.PageSize'
+                        },
+                        success: function (response) {
+                            if (tableContainer) {
+                                tableContainer.innerHTML = response;
+                            }
+                            // Re-attach delete handlers after AJAX update
+                            attachDeleteHandlers();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error during search:', error);
+                        }
+                    });
+                });
+
+                searchForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    searchInput.dispatchEvent(new Event('keyup'));
+                });
+            }
+
             var btnClear = document.getElementById('clearSearch');
             if (btnClear) btnClear.addEventListener('click', function (e) {
                 e.preventDefault();
-                var input = document.querySelector('input[name="searchTerm"]');
-                if (input) input.value = '';
-                var form = this.closest('form');
-                if (form) form.submit();
+                if (searchInput) searchInput.value = '';
+                if (searchInput) searchInput.dispatchEvent(new Event('keyup'));
             });
 
+            // View toggle
             var toggleTable = document.getElementById('toggleTable');
             var toggleGrid = document.getElementById('toggleGrid');
-            var tableView = document.getElementById('employeeTableView');
+            var tableView = document.getElementById('employeeTableContainer');
             var gridView = document.getElementById('employeeGridView');
 
             function setView(view) {
                 if (view === 'grid') {
-                    gridView.classList.remove('d-none');
-                    tableView.classList.add('d-none');
-                    toggleGrid.classList.add('active');
-                    toggleTable.classList.remove('active');
+                    if (gridView) gridView.classList.remove('d-none');
+                    if (tableView) tableView.classList.add('d-none');
+                    if (toggleGrid) toggleGrid.classList.add('active');
+                    if (toggleTable) toggleTable.classList.remove('active');
                 } else {
-                    gridView.classList.add('d-none');
-                    tableView.classList.remove('d-none');
-                    toggleTable.classList.add('active');
-                    toggleGrid.classList.remove('active');
+                    if (gridView) gridView.classList.add('d-none');
+                    if (tableView) tableView.classList.remove('d-none');
+                    if (toggleTable) toggleTable.classList.add('active');
+                    if (toggleGrid) toggleGrid.classList.remove('active');
                 }
             }
 
             if (toggleTable) toggleTable.addEventListener('click', function () { setView('table'); });
             if (toggleGrid) toggleGrid.addEventListener('click', function () { setView('grid'); });
 
-            // sort controls
+            // Delete handlers
+            function attachDeleteHandlers() {
+                var deleteEmployeeId = document.getElementById('deleteEmployeeId');
+                var deleteEmployeeName = document.getElementById('deleteEmployeeName');
+                var deleteEmployeeEmail = document.getElementById('deleteEmployeeEmail');
+                var deleteEmployeeModal = document.getElementById('deleteEmployeeModal');
 
-            var deleteEmployeeId = document.getElementById('deleteEmployeeId');
-            var deleteEmployeeName = document.getElementById('deleteEmployeeName');
-            var deleteEmployeeEmail = document.getElementById('deleteEmployeeEmail');
-            var deleteEmployeeModal = document.getElementById('deleteEmployeeModal');
-
-            document.querySelectorAll('.js-delete-employee').forEach(function (button) {
-                button.addEventListener('click', function () {
-                    if (deleteEmployeeId) deleteEmployeeId.value = this.dataset.employeeId || '';
-                    if (deleteEmployeeName) deleteEmployeeName.textContent = this.dataset.employeeName || '';
-                    if (deleteEmployeeEmail) deleteEmployeeEmail.textContent = this.dataset.employeeEmail || '';
+                document.querySelectorAll('.js-delete-employee').forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        if (deleteEmployeeId) deleteEmployeeId.value = this.dataset.employeeId || '';
+                        if (deleteEmployeeName) deleteEmployeeName.textContent = this.dataset.employeeName || '';
+                        if (deleteEmployeeEmail) deleteEmployeeEmail.textContent = this.dataset.employeeEmail || '';
+                    });
                 });
-            });
 
-            if (deleteEmployeeModal) {
-                deleteEmployeeModal.addEventListener('hidden.bs.modal', function () {
-                    if (deleteEmployeeId) deleteEmployeeId.value = '';
-                    if (deleteEmployeeName) deleteEmployeeName.textContent = '';
-                    if (deleteEmployeeEmail) deleteEmployeeEmail.textContent = '';
-                });
+                if (deleteEmployeeModal) {
+                    deleteEmployeeModal.addEventListener('hidden.bs.modal', function () {
+                        if (deleteEmployeeId) deleteEmployeeId.value = '';
+                        if (deleteEmployeeName) deleteEmployeeName.textContent = '';
+                        if (deleteEmployeeEmail) deleteEmployeeEmail.textContent = '';
+                    });
+                }
             }
+
+            // Initial attach
+            attachDeleteHandlers();
         })();
     </script>
 }
